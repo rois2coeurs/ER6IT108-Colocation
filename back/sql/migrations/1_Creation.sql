@@ -1,14 +1,12 @@
-
 CREATE TABLE tblPerson (  -- Personne/Membre (Admin, Manager, Membre)
     PK_idPerson INT PRIMARY KEY,
     name VARCHAR(100),
     surname VARCHAR(100),
     mail VARCHAR(100),
-    telephone_number CHAR(10) NULL CHECK(telephone_number LIKE ('[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'))
+    telephone_number CHAR(10) NULL CHECK(telephone_number LIKE ('[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')),
     password VARCHAR(100),
     is_manager BOOLEAN,
-    FK_IdColocation INT,
-    FOREIGN KEY (FK_IdColocation) REFERENCES tblColocation(idColocation)
+    FK_IdColocation INT
 );
 
 CREATE TABLE tblColocation ( -- Colocation
@@ -18,7 +16,14 @@ CREATE TABLE tblColocation ( -- Colocation
     city VARCHAR(100),
     postal_code CHAR(5) CHECK(postal_code LIKE ('[0-9][0-9][0-9][0-9][0-9]')),
     FK_Administrator INT,
-    FOREIGN KEY (FK_Administrator) REFERENCES tblPerson(idPerson)
+    FOREIGN KEY (FK_Administrator) REFERENCES tblPerson(PK_idPerson)
+);
+
+CREATE TABLE tblPot ( -- Cagnotte
+                        PK_idPot INT PRIMARY KEY,
+                        sum DECIMAL(10,2),
+                        FK_IdColocation INT,
+                        FOREIGN KEY (FK_IdColocation) REFERENCES tblColocation(PK_idColocation)
 );
 
 CREATE TABLE tblAchat ( -- Achat
@@ -28,15 +33,8 @@ CREATE TABLE tblAchat ( -- Achat
     date DATE,
     FK_IdPot INT,
     FK_IdPerson INT,
-    FOREIGN KEY (FK_IdPot) REFERENCES tblPot(idPot)
-    FOREIGN KEY (FK_IdPerson) REFERENCES tblPerson(idPerson)
-);
-
-CREATE TABLE tblPot ( -- Cagnotte
-    PK_idPot INT PRIMARY KEY,
-    sum DECIMAL(10,2),
-    FK_IdColocation INT,
-    FOREIGN KEY (FK_IdColocation) REFERENCES tblColocation(idColocation)
+    FOREIGN KEY (FK_IdPot) REFERENCES tblPot(PK_idPot),
+    FOREIGN KEY (FK_IdPerson) REFERENCES tblPerson(PK_idPerson)
 );
 
 CREATE TABLE tblAbundance ( -- Abondement
@@ -45,8 +43,8 @@ CREATE TABLE tblAbundance ( -- Abondement
     FK_IdPot INT,
     date DATE,
     amount DECIMAL(10,2),
-    FOREIGN KEY (FK_IdPerson) REFERENCES tblPerson(idPerson)
-    FOREIGN KEY (FK_IdPot) REFERENCES tblPot(idPot)
+    FOREIGN KEY (FK_IdPerson) REFERENCES tblPerson(PK_idPerson),
+    FOREIGN KEY (FK_IdPot) REFERENCES tblPot(PK_idPot)
 );
 
 CREATE TABLE tblPayment ( -- Versement
@@ -55,9 +53,9 @@ CREATE TABLE tblPayment ( -- Versement
     FK_IdPersonReceiver INT,
     date DATE,
     amount DECIMAL(10,2),
-    FOREIGN KEY (FK_IdPersonSender) REFERENCES tblPerson(idPerson),
-    FOREIGN KEY (FK_IdPersonReceiver) REFERENCES tblPerson(idPerson)
-)
+    FOREIGN KEY (FK_IdPersonSender) REFERENCES tblPerson(PK_idPerson),
+    FOREIGN KEY (FK_IdPersonReceiver) REFERENCES tblPerson(PK_idPerson)
+);
 
 CREATE TABLE tblSojourn ( -- Séjourner
     PK_idSojourn INT PRIMARY KEY,
@@ -65,6 +63,6 @@ CREATE TABLE tblSojourn ( -- Séjourner
     dateExit DATE,
     FK_IdPerson INT,
     FK_IdColocation INT,
-    FOREIGN KEY (FK_IdPerson) REFERENCES tblPerson(idPerson),
-    FOREIGN KEY (FK_IdColocation) REFERENCES tblColocation(idColocation)
-)
+    FOREIGN KEY (FK_IdPerson) REFERENCES tblPerson(PK_idPerson),
+    FOREIGN KEY (FK_IdColocation) REFERENCES tblColocation(PK_idColocation)
+);
