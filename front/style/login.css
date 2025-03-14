@@ -1,0 +1,51 @@
+@import "var.css";
+@import "font.css";
+
+body {
+    background-color: var(--primary-color);
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.box {
+    background-color: rgba(223, 224, 226, 0.85);
+    border-radius: 5px;
+    padding: 20px 50px;
+    min-width: 300px;
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.selected {
+    text-decoration: underline;
+    text-decoration-color: var(--secondary-color);
+}
+.input-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+input {
+    border-radius: 5px;
+    border: 1px solid #A19C9C;
+    background-color: #D9D9D9;
+    padding: 10px;
+}
+
+.submit {
+    margin-top: 20px;
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+}
