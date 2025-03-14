@@ -1,5 +1,5 @@
 
-CREATE TABLE tblPerson (  # Personne/Membre (Admin, Manager, Membre)
+CREATE TABLE tblPerson (  -- Personne/Membre (Admin, Manager, Membre)
     PK_idPerson INT PRIMARY KEY,
     name VARCHAR(100),
     surname VARCHAR(100),
@@ -12,7 +12,7 @@ CREATE TABLE tblPerson (  # Personne/Membre (Admin, Manager, Membre)
     FOREIGN KEY (FK_IdColocation) REFERENCES tblColocation(idColocation)
 );
 
-CREATE TABLE tblColocation ( # Colocation
+CREATE TABLE tblColocation ( -- Colocation
     PK_idColocation INT PRIMARY KEY,
     name VARCHAR(100),
     address VARCHAR(100),
@@ -22,7 +22,7 @@ CREATE TABLE tblColocation ( # Colocation
     FOREIGN KEY (FK_Administrator) REFERENCES tblPerson(idPerson)
 );
 
-CREATE TABLE tblAchat ( # Achat
+CREATE TABLE tblAchat ( -- Achat
     PK_idAchat INT PRIMARY KEY,
     title VARCHAR(100),
     amount DECIMAL(10,2),
@@ -33,14 +33,14 @@ CREATE TABLE tblAchat ( # Achat
     FOREIGN KEY (FK_IdPerson) REFERENCES tblPerson(idPerson)
 );
 
-CREATE TABLE tblPot ( # Cagnotte
+CREATE TABLE tblPot ( -- Cagnotte
     PK_idPot INT PRIMARY KEY,
     sum DECIMAL(10,2),
     FK_IdColocation INT,
     FOREIGN KEY (FK_IdColocation) REFERENCES tblColocation(idColocation)
 );
 
-CREATE TABLE tblAbundance ( # Abondement
+CREATE TABLE tblAbundance ( -- Abondement
     PK_idAbundance INT PRIMARY KEY,
     FK_IdPerson INT,
     FK_IdPot INT,
@@ -50,7 +50,7 @@ CREATE TABLE tblAbundance ( # Abondement
     FOREIGN KEY (FK_IdPot) REFERENCES tblPot(idPot)
 );
 
-CREATE TABLE tblPayment ( # Versement
+CREATE TABLE tblPayment ( -- Versement
     PK_idPayment INT PRIMARY KEY,
     FK_IdPersonSender INT,
     FK_IdPersonReceiver INT,
@@ -60,7 +60,7 @@ CREATE TABLE tblPayment ( # Versement
     FOREIGN KEY (FK_IdPersonReceiver) REFERENCES tblPerson(idPerson)
 )
 
-CREATE TABLE tblSojourn ( # Séjourner
+CREATE TABLE tblSojourn ( -- Séjourner
     PK_idSojourn INT PRIMARY KEY,
     dateEntry DATE,
     dateExit DATE,
