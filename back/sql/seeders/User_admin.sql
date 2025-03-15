@@ -1,19 +1,32 @@
 -- Admin users
+
 INSERT INTO users (firstname, name, mail, phone_number, password, is_admin)
-VALUES ('Nicolas', 'Thongphao', 'nicolas.thongphao@gmail.com', '0612345678', 'password', TRUE),
-       ('Valentin', 'Raillard', 'valentin.raillard@coloc.com', '0612345678', 'password', TRUE),
-       ('Admin', 'Test', 'admin.test@gmail.com', '0678901234', 'password', TRUE);
+VALUES ('Nicolas', 'Thongphao', 'nicolas.thongphao@gmail.com', '0612345678',
+        '$argon2id$v=19$m=65536,t=2,p=1$MeSKv0lICDInUP/5Ckc6iDV+NqmjN9eesxdd0iaqbIc$mQZAxinzMvMRZ0eBcpdJRuDW0VKwiyRFwpjzfgr30zE',
+        TRUE),
+       ('Valentin', 'Raillard', 'valentin.raillard@coloc.com', '0612345678',
+        '$argon2id$v=19$m=65536,t=2,p=1$MeSKv0lICDInUP/5Ckc6iDV+NqmjN9eesxdd0iaqbIc$mQZAxinzMvMRZ0eBcpdJRuDW0VKwiyRFwpjzfgr30zE',
+        TRUE),
+       ('Admin', 'Test', 'admin.test@gmail.com', '0678901234',
+        '$argon2id$v=19$m=65536,t=2,p=1$MeSKv0lICDInUP/5Ckc6iDV+NqmjN9eesxdd0iaqbIc$mQZAxinzMvMRZ0eBcpdJRuDW0VKwiyRFwpjzfgr30zE',
+        TRUE);
 
 -- Regular members for first colocation
 INSERT INTO users (firstname, name, mail, phone_number, password)
-VALUES ('Adrien', 'Baril', 'adrien.baril@gmail.com', '0612345678', 'password'),
-       ('Louis', 'Bigo', 'louis.bigo@gmail.com', '0612345678', 'password'),
+VALUES ('Adrien', 'Baril', 'adrien.baril@gmail.com', '0612345678',
+        '$argon2id$v=19$m=65536,t=2,p=1$MeSKv0lICDInUP/5Ckc6iDV+NqmjN9eesxdd0iaqbIc$mQZAxinzMvMRZ0eBcpdJRuDW0VKwiyRFwpjzfgr30zE'),
+       ('Louis', 'Bigo', 'louis.bigo@gmail.com', '0612345678',
+        '$argon2id$v=19$m=65536,t=2,p=1$MeSKv0lICDInUP/5Ckc6iDV+NqmjN9eesxdd0iaqbIc$mQZAxinzMvMRZ0eBcpdJRuDW0VKwiyRFwpjzfgr30zE'),
 -- Regular members for second colocation
-       ('Quentin', 'Couturier', 'quentin.couturier@gmail.com', '0612345678', 'password'),
-       ('Kylian', 'Eury', 'kylian.eury@gmail.com', '0612345678', 'password'),
+       ('Quentin', 'Couturier', 'quentin.couturier@gmail.com', '0612345678',
+        '$argon2id$v=19$m=65536,t=2,p=1$MeSKv0lICDInUP/5Ckc6iDV+NqmjN9eesxdd0iaqbIc$mQZAxinzMvMRZ0eBcpdJRuDW0VKwiyRFwpjzfgr30zE'),
+       ('Kylian', 'Eury', 'kylian.eury@gmail.com', '0612345678',
+        '$argon2id$v=19$m=65536,t=2,p=1$MeSKv0lICDInUP/5Ckc6iDV+NqmjN9eesxdd0iaqbIc$mQZAxinzMvMRZ0eBcpdJRuDW0VKwiyRFwpjzfgr30zE'),
 -- Regular members for third colocation
-       ('Roxane', 'Fuatoga', 'roxane.fuatoga@gmail.com', '0612345678', 'password'),
-       ('Illan', 'Gabarra', 'illan.gabarra@gmail.com', '0612345678', 'password');
+       ('Roxane', 'Fuatoga', 'roxane.fuatoga@gmail.com', '0612345678',
+        '$argon2id$v=19$m=65536,t=2,p=1$MeSKv0lICDInUP/5Ckc6iDV+NqmjN9eesxdd0iaqbIc$mQZAxinzMvMRZ0eBcpdJRuDW0VKwiyRFwpjzfgr30zE'),
+       ('Illan', 'Gabarra', 'illan.gabarra@gmail.com', '0612345678',
+        '$argon2id$v=19$m=65536,t=2,p=1$MeSKv0lICDInUP/5Ckc6iDV+NqmjN9eesxdd0iaqbIc$mQZAxinzMvMRZ0eBcpdJRuDW0VKwiyRFwpjzfgr30zE');
 
 -- Create some sojourns for regular members
 INSERT INTO stays (entry_date, exit_date, user_id, house_share_id)
