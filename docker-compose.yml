@@ -5,8 +5,8 @@ services:
     shm_size: 128mb
     environment:
       POSTGRES_USER: root
-      POSTGRES_PASSWORD: bonsoir123
-      POSTGRES_DB: collocation
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: database
     volumes:
         - postgres_data:/var/lib/postgresql/data
     ports:

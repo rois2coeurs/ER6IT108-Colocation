@@ -1,68 +1,62 @@
-CREATE TABLE tblPerson (  -- Personne/Membre (Admin, Manager, Membre)
-    PK_idPerson INT PRIMARY KEY,
-    name VARCHAR(100),
-    surname VARCHAR(100),
-    mail VARCHAR(100),
-    telephone_number CHAR(10) NULL CHECK(telephone_number LIKE ('[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')),
-    password VARCHAR(100),
-    is_manager BOOLEAN,
-    FK_IdColocation INT
+CREATE TABLE users -- Personne/Membre (Admin, Manager, Membre)
+(
+    id           INT PRIMARY KEY,
+    name         VARCHAR(50)  NOT NULL,
+    firstname    VARCHAR(50)  NOT NULL,
+    mail         VARCHAR(100) NOT NULL UNIQUE,
+    password     CHAR(118)    NOT NULL, -- Hashed password (argon2)
+    is_admin     BOOLEAN      NOT NULL DEFAULT FALSE,
+    phone_number VARCHAR(15) CHECK (phone_number LIKE ('\+?[1-9][0-9]{7,14}'))
 );
 
-CREATE TABLE tblColocation ( -- Colocation
-    PK_idColocation INT PRIMARY KEY,
-    name VARCHAR(100),
-    address VARCHAR(100),
-    city VARCHAR(100),
-    postal_code CHAR(5) CHECK(postal_code LIKE ('[0-9][0-9][0-9][0-9][0-9]')),
-    FK_Administrator INT,
-    FOREIGN KEY (FK_Administrator) REFERENCES tblPerson(PK_idPerson)
+CREATE TABLE house_share -- Colocation
+(
+    id         INT PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL,
+    address    VARCHAR(255) NOT NULL,
+    manager_id INT          NOT NULL REFERENCES house_share (id)
 );
 
-CREATE TABLE tblPot ( -- Cagnotte
-                        PK_idPot INT PRIMARY KEY,
-                        sum DECIMAL(10,2),
-                        FK_IdColocation INT,
-                        FOREIGN KEY (FK_IdColocation) REFERENCES tblColocation(PK_idColocation)
+CREATE TABLE shared_found -- Cagnotte
+(
+    id             INT PRIMARY KEY,
+    amount         DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    house_share_id INT            NOT NULL REFERENCES house_share (id)
 );
 
-CREATE TABLE tblAchat ( -- Achat
-    PK_idAchat INT PRIMARY KEY,
-    title VARCHAR(100),
-    amount DECIMAL(10,2),
-    date DATE,
-    FK_IdPot INT,
-    FK_IdPerson INT,
-    FOREIGN KEY (FK_IdPot) REFERENCES tblPot(PK_idPot),
-    FOREIGN KEY (FK_IdPerson) REFERENCES tblPerson(PK_idPerson)
+CREATE TABLE purchases -- Achat
+(
+    id             INT PRIMARY KEY,
+    title          VARCHAR(100)   NOT NULL,
+    amount         DECIMAL(10, 2) NOT NULL,
+    date           DATE           NOT NULL,
+    shared_fund_id INT            NOT NULL REFERENCES shared_found (id),
+    user_id        INT            NOT NULL REFERENCES users (id)
 );
 
-CREATE TABLE tblAbundance ( -- Abondement
-    PK_idAbundance INT PRIMARY KEY,
-    FK_IdPerson INT,
-    FK_IdPot INT,
-    date DATE,
-    amount DECIMAL(10,2),
-    FOREIGN KEY (FK_IdPerson) REFERENCES tblPerson(PK_idPerson),
-    FOREIGN KEY (FK_IdPot) REFERENCES tblPot(PK_idPot)
+CREATE TABLE contributions -- Abondement
+(
+    id              INT PRIMARY KEY,
+    user_id         INT            NOT NULL REFERENCES users (id),
+    shared_found_id INT            NOT NULL REFERENCES shared_found (id),
+    date            DATE           NOT NULL,
+    amount          DECIMAL(10, 2) NOT NULL
 );
 
-CREATE TABLE tblPayment ( -- Versement
-    PK_idPayment INT PRIMARY KEY,
-    FK_IdPersonSender INT,
-    FK_IdPersonReceiver INT,
-    date DATE,
-    amount DECIMAL(10,2),
-    FOREIGN KEY (FK_IdPersonSender) REFERENCES tblPerson(PK_idPerson),
-    FOREIGN KEY (FK_IdPersonReceiver) REFERENCES tblPerson(PK_idPerson)
+CREATE TABLE transfers -- Versement
+(
+    id          INT PRIMARY KEY,
+    sender_id   INT            NOT NULL REFERENCES users (id),
+    receiver_id INT            NOT NULL REFERENCES users (id),
+    date        DATE           NOT NULL,
+    amount      DECIMAL(10, 2) NOT NULL
 );
 
-CREATE TABLE tblSojourn ( -- Séjourner
-    PK_idSojourn INT PRIMARY KEY,
-    dateEntry DATE,
-    dateExit DATE,
-    FK_IdPerson INT,
-    FK_IdColocation INT,
-    FOREIGN KEY (FK_IdPerson) REFERENCES tblPerson(PK_idPerson),
-    FOREIGN KEY (FK_IdColocation) REFERENCES tblColocation(PK_idColocation)
+CREATE TABLE stays -- Séjourner
+(
+    id             INT PRIMARY KEY,
+    entry_date     DATE NOT NULL,
+    exit_date      DATE,
+    user_id        INT  NOT NULL REFERENCES users (id),
+    house_share_id INT  NOT NULL REFERENCES house_share (id)
 );

@@ -22,14 +22,14 @@ async function applyMigrations() {
 
 async function applyMigration(migration: string) {
     await sql.begin(async tx => {
-        await tx.file("./migrations/" + migration);
+        await tx.file("./sql/migrations/" + migration);
         await tx`INSERT INTO migrationVersion (version)
                  VALUES (${migration.split('_')[0]})`;
     });
 }
 
 async function getAllMigrations() {
-    return await readdir("./migrations");
+    return await readdir("./sql/migrations");
 }
 
 async function getCurrentMigration() {
