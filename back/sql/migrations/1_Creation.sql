@@ -6,7 +6,6 @@ CREATE TABLE tblPerson (  -- Personne/Membre (Admin, Manager, Membre)
     mail VARCHAR(100),
     telephone_number CHAR(10) NULL CHECK(telephone_number LIKE ('[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'))
     password VARCHAR(100),
-    is_admin BOOLEAN,
     is_manager BOOLEAN,
     FK_IdColocation INT,
     FOREIGN KEY (FK_IdColocation) REFERENCES tblColocation(idColocation)
