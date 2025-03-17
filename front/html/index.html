@@ -4,63 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../style/index.css">
-    <title>Acceuil</title>
+    <title>Accueil</title>
 </head>
 <body>
-    <div class="container">
-        <div class="nav-container">
-            <div class="nav">
-                <div class="nav-group">
-                    <a href="index.html">Acceuil</a>
+    <div class="main-container">
+        <div class="sidebar">
+            <nav>
+                <div class="nav-item">
+                    <a href="index.html">Accueil</a>
                 </div>
-                <div class="nav-group">
+                <div class="nav-item active">
                     <a href="house_share.html">Colocation</a>
                 </div>
-                <div class="nav-group">
+                <div class="nav-item">
                     <a href="shared_fund.html">Cagnotte</a>
                 </div>
-                <div class="nav-group">
+                <div class="nav-item">
                     <a href="transfer.html">Versement</a>
                 </div>
-                <div class="nav-group">
+                <div class="nav-item">
                     <a href="purchase.html">Payement</a>
                 </div>
-            </div>
+            </nav>
         </div>
-        <div class="title-container">
-            <div class="Main title">
-                <h1>Colocation</h1>
-            </div>
-        </div>
-        <div class="profile-container">
-            <div class="profile">
-                <p><span class="profile-email">Email</span></p>
-                <button class="edit-profile" type="button">Profile button access (logo)</button>
-            </div>
-        </div>
-        <div class="utility-container">
-            <div class="creation-container">
-                <div class="create_house_share">
-                    <h2>(logo)Créer une nouvelle colocation</h2>
-                    <form action="" method="post">
-                        <div class="input-group">
-                            <label for="name">Nom:</label>
-                            <input type="name" name="name" id="name" placeholder="Nom de la colocation..." required>
-                        </div>
-                        <div class="input-group">
-                            <label for="address">Adresse:</label>
-                            <input type="address" name="address" id="address" placeholder="Adresse de la colocation..." required>
-                        </div>
-                    </form>
-                    <button type="submit" class="submit">Créer la colocation</button>
+
+        <div class="content-area">
+            <div class="header">
+                <div class="title">
+                    <h1>Colocation</h1>
+                </div>
+                <div class="profile">
+                    <span class="profile-email">vraillard@gmail.com</span>
+                    <div class="profile-icon">
+                        <img src="../assets/profile-icon.png" alt="Profile">
+                    </div>
                 </div>
             </div>
-            <div class="invitation-container">
-                <div class="invitation_house_share">
-                    <h2>(logo)Invitations en attente</h2>
-                    <p><span class="invitation-text">(user) vous invite à rejoindre une (colocation)</span></p>
-                    <button class="accept-invite" type="button">Accept(logo)</button>
-                    <button class="decline-invite" type="button">Refuse(logo)</button>
+
+            <div class="utility-container">
+                <div class="card creation-container">
+                    <div class="card-header">
+                        <span class="icon">+</span>
+                        <h2>Crée une nouvelle collocation</h2>
+                    </div>
+                    <div class="card-content">
+                        <form>
+                            <div class="input-group">
+                                <label for="name">Nom:</label>
+                                <input type="text" name="name" id="name" placeholder="Nom de la collocation...">
+                            </div>
+                            <div class="input-group">
+                                <label for="address">Adresse:</label>
+                                <input type="text" name="address" id="address" placeholder="Adresse de la collocation...">
+                            </div>
+                            <button type="submit" class="submit">Crée la collocation</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card invitation-container">
+                    <div class="card-header">
+                        <span class="icon">≡</span>
+                        <h2>Invitations en attente</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="invitation-item">
+                            <p class="invitation-text">Valentin raillard vous invite à rejoindre "camping 2025"</p>
+                            <div class="invitation-actions">
+                                <button class="accept-invite">✓</button>
+                                <button class="decline-invite">✗</button>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="invitation-item">
+                            <p class="invitation-text">Valentin raillard vous invite à rejoindre "camping 2025"</p>
+                            <div class="invitation-actions">
+                                <button class="accept-invite">✓</button>
+                                <button class="decline-invite">✗</button>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="invitation-item">
+                            <p class="invitation-text">Valentin raillard vous invite à rejoindre "camping 2025"</p>
+                            <div class="invitation-actions">
+                                <button class="accept-invite">✓</button>
+                                <button class="decline-invite">✗</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
