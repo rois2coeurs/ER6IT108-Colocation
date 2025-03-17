@@ -2,6 +2,6 @@ DROP TABLE IF EXISTS stays;
 DROP TABLE IF EXISTS transfers;
 DROP TABLE IF EXISTS contributions;
 DROP TABLE IF EXISTS purchases;
-DROP TABLE IF EXISTS shared_found;
+DROP TABLE IF EXISTS shared_fund;
 DROP TABLE IF EXISTS house_share;
 DROP TABLE IF EXISTS users;

@@ -17,7 +17,7 @@ CREATE TABLE house_share -- Colocation
     manager_id INT          NOT NULL REFERENCES house_share (id)
 );
 
-CREATE TABLE shared_found -- Cagnotte
+CREATE TABLE shared_fund -- Cagnotte
 (
     id             SERIAL PRIMARY KEY,
     amount         DECIMAL(10, 2) NOT NULL DEFAULT 0,
@@ -30,7 +30,7 @@ CREATE TABLE purchases -- Achat
     title          VARCHAR(100)   NOT NULL,
     amount         DECIMAL(10, 2) NOT NULL,
     date           DATE           NOT NULL,
-    shared_fund_id INT            NOT NULL REFERENCES shared_found (id),
+    shared_fund_id INT            NOT NULL REFERENCES shared_fund (id),
     user_id        INT            NOT NULL REFERENCES users (id)
 );
 
@@ -38,7 +38,7 @@ CREATE TABLE contributions -- Abondement
 (
     id              SERIAL PRIMARY KEY,
     user_id         INT            NOT NULL REFERENCES users (id),
-    shared_found_id INT            NOT NULL REFERENCES shared_found (id),
+    shared_fund_id INT            NOT NULL REFERENCES shared_fund (id),
     date            DATE           NOT NULL,
     amount          DECIMAL(10, 2) NOT NULL
 );
