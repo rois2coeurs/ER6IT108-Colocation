@@ -21,6 +21,12 @@ export class TokenHelper {
         if (!tokenObject) return null;
         return tokenObject.getUserId();
     }
+
+    static getUserId(req: Request): number | null {
+        const authorization = req.headers.get('Authorization');
+        const token = authorization?.replace('Bearer ', '');
+        return TokenHelper.checkToken(token || '');
+    }
 }
 
 

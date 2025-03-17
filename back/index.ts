@@ -1,9 +1,11 @@
 import authRoutes from "./routes/authRoutes.ts";
+import houseShareRoutes from "./routes/houseShareRoutes.ts";
 
 Bun.serve({
     port: 3000,
     routes: {
         ...authRoutes,
+        ...houseShareRoutes,
         '/health': new Response("OK", {status: 200}),
     },
     error(error) {
