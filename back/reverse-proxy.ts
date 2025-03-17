@@ -1,3 +1,22 @@
+import type { SpawnOptions } from "bun"
+
+const spawnOptions: SpawnOptions.OptionsObject = {
+    stdin: "inherit",
+    stdout: "inherit",
+    stderr: "inherit",
+}
+
+const run = async () => {
+    Bun.spawn(["bun", "run", "--watch", "index.ts"], spawnOptions)
+
+    process.on("SIGINT", async () => {
+        console.log("Stopping...");
+        process.exit()
+    })
+}
+
+run()
+
 const serve = Bun.serve({
     port: 8090,
     async fetch(req) {
@@ -19,6 +38,8 @@ const serve = Bun.serve({
         }
     }
 });
+
+console.log(`Reverse proxy running on ${serve.url}`);
 
 function getFileType(file: string) {
     const ext = file.split('.').pop();

@@ -16,10 +16,11 @@ loginForm.addEventListener('submit', async (e) => {
     })
 
     const resData = await res.json();
-    if(resData.success) {
+    console.log(resData);
+    if(res.ok) {
         localStorage.setItem('token', resData.token);
-        alert(resData);
+        alert("Login successful");
     } else {
-        alert(resData.message);
+        alert("Login failed");
     }
 })
