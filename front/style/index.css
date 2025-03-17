@@ -84,7 +84,7 @@ input {
 .profile-icon {
     width: 50px;
     height: 50px;
-    background-color: #000;
+    background-color: var(--third-color);
     border-radius: 50%;
     overflow: hidden;
 }
@@ -184,4 +184,33 @@ hr {
     border: none;
     border-top: 1px solid #eee;
     margin: 10px 0;
+}
+
+/* profile button */
+
+.profile-icon {
+    width: 50px;
+    height: 50px;
+    background-color: var(--third-color);
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.profile-icon:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.profile-icon a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.profile-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
