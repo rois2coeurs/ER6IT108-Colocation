@@ -28,3 +28,65 @@ a {
     cursor: pointer;
     width: 90%;
 }
+
+.submit:hover {
+    background-color: #EB5160;
+}
+
+.nav-container {
+    padding: 10px;
+    background-color: var(--primary-color);
+}
+
+.nav-container a {
+    color: white;
+    text-decoration: none;
+}
+
+.nav-container a:hover {
+    color: var(--secondary-color);
+}
+
+.nav {
+    display: inline;
+    justify-content: left;
+    align-items: left;
+}
+
+.nav-group {
+    margin: 5px;
+}
+
+.container form button {
+    margin-top: 20px;
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.title-container {
+    display: flex;
+    justify-content: left;
+    height: 20%;
+    color: rgb(0, 0, 0);
+}
+
+.container {
+    display: flex;
+    justify-content: left; 
+    flex-direction: row;
+    height: 100%;   
+    color: rgb(0, 0, 0);
+}
+
+.utility-container {
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: row;
+    flex-wrap: wrap;
+    height: 80%;
+    color: rgb(0, 0, 0);
+}
