@@ -19,14 +19,14 @@ VALUES ('2025-01-01', NULL, 1, 1),
        ('2025-01-01', NULL, 3, 3);
 
 
--- A little Abundance from the first admiunistrator
+-- A little Abundance from the first administrator
 INSERT INTO contributions (user_id, shared_fund_id, date, amount)
 VALUES (1, 1, '2025-01-02', 10.00);
 
--- A little Payment (Versement) from the first admiunistrator too
+-- A little Payment (Versement) from the first administrator too
 INSERT INTO transfers (sender_id, receiver_id, date, amount)
 VALUES ( 1, 2, '2025-01-03', 5.00);
 
--- A little Achat from the first admiunistrator too
+-- A little Achat from the first administrator too
 INSERT INTO purchases (title, amount, date, shared_fund_id, user_id)
 VALUES ('Crousty', 15.00, '2025-01-04', 1, 1);
