@@ -1,16 +1,9 @@
-import {AuthHelper} from "./helpers/authHelper.ts";
-import {TokenHelper} from "./helpers/tokenHelper.ts";
-
-const tokenHelper = new TokenHelper();
+import authRoutes from "./routes/authRoutes.ts";
 
 Bun.serve({
     port: 3000,
     routes: {
-        '/login': {
-            POST: async (req) => {
-                return await AuthHelper.login(req, tokenHelper);
-            }
-        },
+        ...authRoutes,
         '/health': new Response("OK", {status: 200}),
     },
     error(error) {

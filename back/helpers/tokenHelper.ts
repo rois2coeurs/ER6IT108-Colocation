@@ -1,23 +1,23 @@
 import {randomUUIDv7} from "bun";
 const TOKEN_MAX_AGE = 1000 * 60 * 60 * 12; // 12 hours
 
-export class TokenHelper {
-    private tokens: Array<Token> = [];
+let tokens: Array<Token> = [];
 
-    createToken(userId: number) {
-        const userToken = this.tokens.find(t => t.getUserId() === userId);
-        if (userToken) this.tokens = this.tokens.filter(t => t.getToken() !== userToken.getToken());
+export class TokenHelper {
+    static createToken(userId: number) {
+        const userToken = tokens.find(t => t.getUserId() === userId);
+        if (userToken) tokens = tokens.filter(t => t.getToken() !== userToken.getToken());
 
         const token = randomUUIDv7();
-        this.tokens.push(new Token(token, userId));
+        tokens.push(new Token(token, userId));
         setTimeout(() => {
-            this.tokens = this.tokens.filter(t => t.getToken() !== token);
+            tokens = tokens.filter(t => t.getToken() !== token);
         }, TOKEN_MAX_AGE);
         return token;
     }
 
-    checkToken(token: string) {
-        const tokenObject = this.tokens.find(t => t.getToken() === token);
+    static checkToken(token: string) {
+        const tokenObject = tokens.find(t => t.getToken() === token);
         if (!tokenObject) return null;
         return tokenObject.getUserId();
     }
