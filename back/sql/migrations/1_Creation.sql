@@ -30,17 +30,17 @@ CREATE TABLE purchases -- Achat
     title          VARCHAR(100)   NOT NULL,
     amount         DECIMAL(10, 2) NOT NULL,
     date           DATE           NOT NULL,
-    shared_fund_id INT            NOT NULL REFERENCES shared_fund (id),
+    shared_fund_id INT            REFERENCES shared_fund (id),
     user_id        INT            NOT NULL REFERENCES users (id)
 );
 
 CREATE TABLE contributions -- Abondement
 (
-    id              SERIAL PRIMARY KEY,
-    user_id         INT            NOT NULL REFERENCES users (id),
+    id             SERIAL PRIMARY KEY,
+    user_id        INT            NOT NULL REFERENCES users (id),
     shared_fund_id INT            NOT NULL REFERENCES shared_fund (id),
-    date            DATE           NOT NULL,
-    amount          DECIMAL(10, 2) NOT NULL
+    date           DATE           NOT NULL,
+    amount         DECIMAL(10, 2) NOT NULL
 );
 
 CREATE TABLE transfers -- Versement
