@@ -1,0 +1,30 @@
+@import "var.css";
+@import "font.css";
+
+body {
+    background-color: var(--third-color);
+}
+
+input {
+    border-radius: 5px;
+    border: 1px solid #A19C9C;
+    background-color: #D9D9D9;
+    padding: 10px;
+}
+
+a {
+    text-decoration: inherit;
+    color: inherit;
+}
+
+.submit {
+    margin-top: 20px;
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 10px;
+    margin-left: 5%;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    width: 90%;
+}
