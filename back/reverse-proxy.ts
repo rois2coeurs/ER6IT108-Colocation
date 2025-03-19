@@ -26,7 +26,15 @@ const serve = Bun.serve({
         }
         if (url.pathname.startsWith('/front/')) {
             const file = Bun.file("../" + url.pathname);
+            if (!file) return new Response('File not found', {status: 404});
             console.log(url + " ==> " + "../" + url.pathname);
+            if (file.name?.endsWith('.png')) {
+                return new Response(await file.arrayBuffer(), {
+                    headers: {
+                        'Content-Type': getFileType(file.name || '')
+                    }
+                });
+            }
             return new Response(await file.text(), {
                 headers: {
                     'Content-Type': getFileType(file.name || '')
@@ -46,5 +54,7 @@ function getFileType(file: string) {
     if (ext === 'html') return 'text/html';
     if (ext === 'css') return 'text/css';
     if (ext === 'js') return 'text/javascript';
+    if (ext === 'json') return 'application/json';
+    if (ext === 'png') return 'image/png';
     return 'text/plain';
 }
