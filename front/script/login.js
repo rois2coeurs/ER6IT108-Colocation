@@ -1,4 +1,23 @@
 const loginForm = document.getElementById('login-form');
+const errorElem = document.getElementById('error');
+
+
+async function checkToken() {
+    if (localStorage.getItem('token')) {
+        const res = await fetch('/validate', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+        if (!res.ok) {
+            localStorage.removeItem('token');
+        } else {
+            window.location.href = 'house_share.html';
+        }
+    }
+}
+
+checkToken();
 
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -17,10 +36,12 @@ loginForm.addEventListener('submit', async (e) => {
 
     const resData = await res.json();
     console.log(resData);
-    if(res.ok) {
+    if (res.ok) {
         localStorage.setItem('token', resData.token);
-        alert("Login successful");
+        window.location.href = 'house_share.html';
     } else {
+        errorElem.innerText = resData.error;
+        errorElem.style.display = 'block';
         alert("Login failed");
     }
 })

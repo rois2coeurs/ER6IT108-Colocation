@@ -3,20 +3,20 @@ const createColocationForm = document.getElementById('create-colocation-form');
 createColocationForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
-    
+
     if (!token) {
         alert('Veuillez vous connecter pour créer une colocation');
         return;
     }
-    
+
     const formData = new FormData(createColocationForm);
     const data = {
         name: formData.get('name'),
         address: formData.get('address')
     };
-    
+
     try {
-        const res = await fetch('http://localhost:8090/house_share', {
+        const res = await fetch('http://localhost:8090/house-share', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -26,7 +26,7 @@ createColocationForm.addEventListener('submit', async (e) => {
         });
 
         const resData = await res.json();
-        
+
         if (res.ok) {
             alert('Colocation créée avec succès!');
             createColocationForm.reset();
@@ -49,7 +49,7 @@ function displayInvitations(invitations) {
     }
 
     let invitationsHTML = '';
-    
+
     invitations.forEach(invitation => {
         invitationsHTML += `
             <div class="invitation-item" data-id="${invitation.id}">
@@ -64,6 +64,6 @@ function displayInvitations(invitations) {
             <hr>
         `;
     });
-    
+
     invitationContainer.innerHTML = invitationsHTML;
 }
