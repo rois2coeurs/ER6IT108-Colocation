@@ -16,7 +16,7 @@ createColocationForm.addEventListener('submit', async (e) => {
     };
     
     try {
-        const res = await fetch('http://localhost:8090/colocation', {
+        const res = await fetch('http://localhost:8090/house_share', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
