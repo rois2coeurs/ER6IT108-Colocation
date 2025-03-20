@@ -38,7 +38,7 @@ loginForm.addEventListener('submit', async (e) => {
     console.log(resData);
     if (res.ok) {
         localStorage.setItem('token', resData.token);
-        window.location.href = 'house_share.html';
+        window.location.href = 'my_house_share.html';
     } else {
         errorElem.innerText = resData.error;
         errorElem.style.display = 'block';
