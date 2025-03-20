@@ -14,7 +14,7 @@ async function loadData(id) {
     });
 
     if (!res.ok) {
-        window.location.href = 'my_house_share.html';
+        window.location.href = 'house_share_index.html';
         return;
     }
 
