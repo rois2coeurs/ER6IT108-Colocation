@@ -5,5 +5,11 @@ export default {
         POST: async (req: Request) => {
             return await AuthHelper.login(req);
         }
+    },
+    '/validate': {
+        GET: async (req: Request) => {
+            const userId = AuthHelper.checkAuth(req);
+            return Response.json({userId});
+        }
     }
 }

@@ -1,4 +1,4 @@
-import type { SpawnOptions } from "bun"
+import type {SpawnOptions} from "bun"
 
 const spawnOptions: SpawnOptions.OptionsObject = {
     stdin: "inherit",
@@ -15,31 +15,19 @@ const run = async () => {
     })
 }
 
-run()
+run().then(() => {
+    console.log("Backend is up and ready.")
+});
 
 const serve = Bun.serve({
     port: 8090,
     async fetch(req) {
         const url = new URL(req.url);
-        if (url.hostname !== 'localhost') {
-            return new Response('Reverse proxy only works on localhost', {status: 400});
-        }
         if (url.pathname.startsWith('/front/')) {
             const file = Bun.file("../" + url.pathname);
             if (!file) return new Response('File not found', {status: 404});
             console.log(url + " ==> " + "../" + url.pathname);
-            if (file.name?.endsWith('.png')) {
-                return new Response(await file.arrayBuffer(), {
-                    headers: {
-                        'Content-Type': getFileType(file.name || '')
-                    }
-                });
-            }
-            return new Response(await file.text(), {
-                headers: {
-                    'Content-Type': getFileType(file.name || '')
-                }
-            });
+            return new Response(file);
         } else {
             console.log(url + " ==> http://localhost:3000" + url.pathname);
             return fetch(`http://localhost:3000${url.pathname}`, req);
@@ -47,14 +35,5 @@ const serve = Bun.serve({
     }
 });
 
+console.warn("/!\\ This is a development reverse proxy, do not use it in production. /!\\");
 console.log(`Reverse proxy running on ${serve.url}`);
-
-function getFileType(file: string) {
-    const ext = file.split('.').pop();
-    if (ext === 'html') return 'text/html';
-    if (ext === 'css') return 'text/css';
-    if (ext === 'js') return 'text/javascript';
-    if (ext === 'json') return 'application/json';
-    if (ext === 'png') return 'image/png';
-    return 'text/plain';
-}
