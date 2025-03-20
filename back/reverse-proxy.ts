@@ -23,7 +23,6 @@ const serve = Bun.serve({
     port: 8090,
     async fetch(req) {
         const url = new URL(req.url);
-        if (url.hostname !== 'localhost') return new Response('Reverse proxy only works on localhost', {status: 400});
         if (url.pathname.startsWith('/front/')) {
             const file = Bun.file("../" + url.pathname);
             if (!file) return new Response('File not found', {status: 404});
