@@ -33,10 +33,10 @@
     <div class="content-area">
         <div class="header">
             <div class="title">
-                <h1>Colocation</h1>
+                <h1>Vous faites partie de [Nom Colocation]</h1>
             </div>
             <div class="profile">
-                <span class="profile-email">Connectez-vous</span>
+                <span class="profile-email">[email]</span>
                 <div class="profile-icon">
                     <a href="user-info.html">
                         <img src="../assets/profile-icon.png" alt="Profile">
@@ -46,35 +46,26 @@
         </div>
 
         <div class="utility-container">
-            <div class="card creation-container">
-                <div class="card-header">
-                    <span class="icon">+</span>
-                    <h2>Crée une nouvelle collocation</h2>
-                </div>
-                <div class="card-content">
-                    <form id="create-colocation-form">
-                        <div class="input-group">
-                            <label for="name">Nom:</label>
-                            <input type="text" name="name" id="name" placeholder="Nom de la collocation..." required>
-                        </div>
-                        <div class="input-group">
-                            <label for="address">Adresse:</label>
-                            <input type="text" name="address" id="address" placeholder="Adresse de la collocation..."
-                                   required>
-                        </div>
-                        <button type="submit" class="submit">Créer la collocation</button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="card invitation-container">
+            <div class="card members-container">
                 <div class="card-header">
                     <span class="icon">≡</span>
-                    <h2>Invitations en attente</h2>
+                    <h2>Membres</h2>
                 </div>
                 <div class="card-content">
-                    <p>Chargement des invitations...</p>
+                    <p>Chargement des membres...</p>
                 </div>
+                <button class="toggle">Afficher Tout</button>
+            </div>
+
+            <div class="card payements-container">
+                <div class="card-header">
+                    <span class="icon">≡</span>
+                    <h2>Achats</h2>
+                </div>
+                <div class="card-content">
+                    <p>Chargement des achats...</p>
+                </div>
+                <button class="toggle">Afficher Tout</button>
             </div>
         </div>
     </div>
