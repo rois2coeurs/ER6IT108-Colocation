@@ -67,7 +67,7 @@ input {
 
 .title h1 {
     color: #e6505c;
-    font-size: 36px;
+    font-size: x-large;
     text-decoration: underline;
 }
 
@@ -93,6 +93,7 @@ input {
 .utility-container {
     display: flex;
     justify-content: space-evenly;
+    flex-direction: column;
 }
 
 .card {
@@ -100,8 +101,9 @@ input {
     border-radius: 15px;
     box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.15);
     width: 100%;
-    max-width: 40%;
+    max-width: 90%;
     padding: 40px;
+    margin-bottom: 50px;
 }
 
 .card-header {
@@ -121,18 +123,9 @@ input {
     font-weight: normal;
 }
 
-.input-group {
-    margin-bottom: 15px;
-}
-
-.input-group label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.submit {
-    background-color: #b48c94;
-    color: white;
+.toggle {
+    background-color: #e6505c;
+    color: rgb(141, 137, 137);
     border: none;
     border-radius: 10px;
     padding: 12px;
@@ -143,47 +136,8 @@ input {
     transition: background-color 0.3s;
 }
 
-.submit:hover {
-    background-color: #e6505c;
-}
-
-/* Invitation styles */
-.invitation-item {
-    padding: 10px 0;
-}
-
-.invitation-text {
-    margin-bottom: 10px;
-}
-
-.invitation-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.accept-invite, .decline-invite {
-    width: 40px;
-    height: 40px;
-    border-radius: 5px;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-}
-
-.accept-invite {
-    background-color: #b48c94;
-    color: white;
-}
-
-.decline-invite {
-    background-color: #ccc;
-    color: black;
-}
-
-hr {
-    border: none;
-    border-top: 1px solid #eee;
-    margin: 10px 0;
+.toggle:hover {
+    background-color: #dc2d3b;
 }
 
 /* profile button */
