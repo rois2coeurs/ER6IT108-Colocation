@@ -67,7 +67,7 @@ input {
 
 .title h1 {
     color: #e6505c;
-    font-size: 36px;
+    font-size: x-large;
     text-decoration: underline;
 }
 
@@ -121,9 +121,18 @@ input {
     font-weight: normal;
 }
 
-.toggle {
-    background-color: #e6505c;
-    color: rgb(141, 137, 137);
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.submit {
+    background-color: #b48c94;
+    color: white;
     border: none;
     border-radius: 10px;
     padding: 12px;
@@ -134,8 +143,8 @@ input {
     transition: background-color 0.3s;
 }
 
-.toggle:hover {
-    background-color: #dc2d3b;
+.submit:hover {
+    background-color: #e6505c;
 }
 
 /* Invitation styles */
