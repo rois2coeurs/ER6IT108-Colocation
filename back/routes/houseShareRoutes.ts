@@ -55,6 +55,32 @@ export default {
 
             return Response.json({message: "House-share updated"}, {status: 200});
         }
+    },
+    '/house-share/:id/members' : {
+        GET: async (req: BunRequest<"/house-share/:id/members">) => {
+            AuthHelper.checkAuth(req);
+            const {id} = req.params;
+            const members = await getHouseShareMembers(Number(id));
+            return Response.json(members);
+        },
+        POST: async (req: BunRequest<"/house-share/:id/members">) => {
+            const userId = AuthHelper.checkAuth(req);
+            const {id} = req.params;
+            if (!userId) throw new SafeDisplayError("Missing fields", 400);
+
+            await addHouseShareMember(Number(userId), Number(id));
+
+            return Response.json({message: "User added to house-share"}, {status: 201});
+        },
+        PUT: async (req: BunRequest<"/house-share/:id/members">) => {
+            const userId = AuthHelper.checkAuth(req);
+            const {id} = req.params;
+            if (!userId) throw new SafeDisplayError("Missing fields", 400);
+
+            await updateHouseShareMember(Number(userId), Number(id));
+
+            return Response.json({message: "User added to house-share"}, {status: 201});
+        }
     }
 }
 
@@ -86,4 +112,22 @@ async function updateHouseShare(name: string, address: string, id: number) {
               SET name    = ${name},
                   address = ${address}
               WHERE id = ${id};`;
+}
+
+async function getHouseShareMembers(id: number) {
+    await sql`SELECT *
+            FROM stays
+            INNER JOIN users ON user_id = users.id
+            WHERE house_share_id = ${id};`;
+}
+
+async function addHouseShareMember(userId: number, id: number) {
+    await sql`INSERT INTO stays (entry_date, user_id, house_share_id)
+                VALUES (${new Date().toLocaleString()},${userId},${id});`;
+}
+
+async function updateHouseShareMember(userId: number, id: number) {
+    await sql`UPDATE stays 
+            SET exit_date = ${new Date().toLocaleString()}
+            WHERE house_share_id = ${id} AND user_id = ${userId};`; 
 }
