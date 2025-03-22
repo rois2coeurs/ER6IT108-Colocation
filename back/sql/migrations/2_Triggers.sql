@@ -1,14 +1,22 @@
 CREATE FUNCTION stay_dates_check() RETURNS TRIGGER AS
 $$
 BEGIN
+    -- An entry_date must be before exit_date
     IF NEW.exit_date IS NOT NULL AND NEW.exit_date < NEW.entry_date THEN
         RAISE EXCEPTION 'exit_date must be greater than entry_date';
     END IF;
-    IF NEW.exist_date IS NULL AND EXISTS((SELECT id
+    -- A user can't stay in two places at the same time
+    IF NEW.exit_date IS NULL AND EXISTS((SELECT id
                                           FROM stays
                                           WHERE user_id = NEW.user_id
                                             AND (exit_date IS NULL OR exit_date >= NEW.exit_date))) THEN
         RAISE EXCEPTION 'User is already staying somewhere else';
+    END IF;
+    -- A user can't stay in a place in the past compared to his last stay
+    IF NEW.entry_date < (SELECT COALESCE(MAX(exit_date), '1970-01-01'::DATE) -- If there is no previous stay, we consider the epoch
+                         FROM stays
+                         WHERE user_id = NEW.user_id) THEN
+        RAISE EXCEPTION 'User can''t stay in a place in the past compared to his last stay';
     END IF;
     RETURN NEW;
 END;
@@ -21,29 +29,8 @@ CREATE TRIGGER stay_dates_check
 EXECUTE FUNCTION stay_dates_check();
 
 
-CREATE FUNCTION house_share_manager_check() RETURNS TRIGGER AS
-$$
-BEGIN
-    -- Check if manager_id is not in another active house_share
-    IF EXISTS((SELECT house_share_id
-               FROM house_share_active
-               WHERE house_share_id = NEW.manager_id)) THEN
-        RAISE EXCEPTION 'Manager is already managing another house_share';
-    END IF;
-END;
-$$ LANGUAGE plpgsql;
+ALTER TABLE house_share
+    ALTER COLUMN manager_id DROP NOT NULL;
+ALTER TABLE house_share
+    ADD CONSTRAINT unique_manager_id UNIQUE (manager_id);
 
-CREATE TRIGGER house_share_manager_check
-    BEFORE INSERT OR UPDATE
-    ON house_share
-    FOR EACH ROW
-EXECUTE FUNCTION house_share_manager_check();
-
-
-CREATE VIEW house_share_active AS
-(
-SELECT house_share_id
-FROM stays
-WHERE exit_date IS NULL
-GROUP BY house_share_id
-    );
