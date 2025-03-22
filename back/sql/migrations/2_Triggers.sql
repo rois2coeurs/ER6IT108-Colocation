@@ -28,9 +28,10 @@ CREATE TRIGGER stay_dates_check
     FOR EACH ROW
 EXECUTE FUNCTION stay_dates_check();
 
-
+-- A house share can have no manager if it's an ended house share
 ALTER TABLE house_share
     ALTER COLUMN manager_id DROP NOT NULL;
+-- Add a constraint to ensure that a manager can't manage multiple house shares
 ALTER TABLE house_share
     ADD CONSTRAINT unique_manager_id UNIQUE (manager_id);
 
