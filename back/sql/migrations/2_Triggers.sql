@@ -7,15 +7,17 @@ BEGIN
     END IF;
     -- A user can't stay in two places at the same time
     IF NEW.exit_date IS NULL AND EXISTS((SELECT id
-                                          FROM stays
-                                          WHERE user_id = NEW.user_id
-                                            AND (exit_date IS NULL OR exit_date >= NEW.exit_date))) THEN
+                                         FROM stays
+                                         WHERE user_id = NEW.user_id
+                                           AND (exit_date IS NULL OR exit_date >= NEW.exit_date))) THEN
         RAISE EXCEPTION 'User is already staying somewhere else';
     END IF;
     -- A user can't stay in a place in the past compared to his last stay
-    IF NEW.entry_date < (SELECT COALESCE(MAX(exit_date), '1970-01-01'::DATE) -- If there is no previous stay, we consider the epoch
-                         FROM stays
-                         WHERE user_id = NEW.user_id) THEN
+    -- OLD.entry_date is NULL if it's an INSERT
+    IF OLD.entry_date IS NULL AND NEW.entry_date <
+                                  (SELECT COALESCE(MAX(exit_date), '1970-01-01'::DATE) -- If there is no previous stay, we consider the epoch
+                                   FROM stays
+                                   WHERE user_id = NEW.user_id) THEN
         RAISE EXCEPTION 'User can''t stay in a place in the past compared to his last stay';
     END IF;
     RETURN NEW;
