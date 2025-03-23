@@ -5,12 +5,13 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
 }
 
 body {
     background-color: #f2f2f2;
-    height: 100vh;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 a {
@@ -18,19 +19,10 @@ a {
     color: inherit;
 }
 
-input {
-    border-radius: 5px;
-    border: 1px solid #A19C9C;
-    background-color: #fff;
-    padding: 10px;
-    width: 100%;
-    font-size: 16px;
-}
-
 /* Main Layout */
 .main-container {
     display: flex;
-    height: 100vh;
+    flex: 1;
 }
 
 /* Sidebar Navigation */
@@ -48,7 +40,7 @@ input {
 }
 
 .nav-item:hover, .nav-item.active {
-    border-bottom: 2px solid #e6505c;
+    border-bottom: 2px solid var(--secondary-color);
 }
 
 /* Content Area */
@@ -66,15 +58,25 @@ input {
 }
 
 .title h1 {
-    color: #e6505c;
-    font-size: x-large;
-    text-decoration: underline;
+    color: var(--secondary-color);
+    font-size: 24px;
+    position: relative;
+}
+
+.title h1:after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--secondary-color);
 }
 
 .profile {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 20px;
 }
 
 .profile-email {
@@ -87,23 +89,31 @@ input {
     background-color: var(--third-color);
     border-radius: 50%;
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid var(--accent-color);
+}
+
+.profile-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 /* Card Containers */
 .utility-container {
     display: flex;
-    justify-content: space-evenly;
     flex-direction: column;
+    gap: 40px;
 }
 
 .card {
     background-color: white;
     border-radius: 15px;
-    box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 25px;
     width: 100%;
-    max-width: 90%;
-    padding: 40px;
-    margin-bottom: 50px;
 }
 
 .card-header {
@@ -111,60 +121,66 @@ input {
     align-items: center;
     gap: 10px;
     margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
 }
 
 .icon {
     font-size: 24px;
     font-weight: bold;
+    color: var(--accent-color);
 }
 
 .card-header h2 {
     font-size: 20px;
-    font-weight: normal;
+    font-weight: 500;
+}
+
+.card-content {
+    margin-bottom: 20px;
+}
+
+.member-item, .purchase-item {
+    padding: 10px;
+    border-bottom: 1px solid #f3f3f3;
+}
+
+.member-item:last-child, .purchase-item:last-child {
+    border-bottom: none;
 }
 
 .toggle {
-    background-color: #e6505c;
-    color: rgb(141, 137, 137);
+    background-color: var(--secondary-color);
+    color: white;
     border: none;
-    border-radius: 10px;
-    padding: 12px;
+    border-radius: 8px;
+    padding: 10px 15px;
     font-size: 16px;
     cursor: pointer;
     width: 100%;
-    margin-top: 15px;
     transition: background-color 0.3s;
 }
 
 .toggle:hover {
-    background-color: #dc2d3b;
+    background-color: #d83848;
 }
 
-/* profile button */
-
-.profile-icon {
-    width: 50px;
-    height: 50px;
-    background-color: var(--third-color);
-    border-radius: 50%;
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+/* Footer */
+footer {
+    background-color: #0e1419;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    margin-top: auto;
 }
 
-.profile-icon:hover {
-    transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+.validators {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
 }
 
-.profile-icon a {
-    display: block;
-    width: 100%;
-    height: 100%;
-}
-
-.profile-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.validators a {
+    color: var(--accent-color);
+    text-decoration: underline;
 }

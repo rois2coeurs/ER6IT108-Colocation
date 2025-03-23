@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,7 +16,7 @@
                 <a href="index.html">Accueil</a>
             </div>
             <div class="nav-item active">
-                <a href="house_share.html">Colocation</a>
+                <a href="house_share.html">Coloc</a>
             </div>
             <div class="nav-item">
                 <a href="shared_fund.html">Cagnotte</a>
@@ -25,7 +25,7 @@
                 <a href="transfer.html">Versement</a>
             </div>
             <div class="nav-item">
-                <a href="purchase.html">Payement</a>
+                <a href="purchase.html">Paiement</a>
             </div>
         </nav>
     </div>
@@ -33,13 +33,13 @@
     <div class="content-area">
         <div class="header">
             <div class="title">
-                <h1>Vous faites partie de [Nom Colocation]</h1>
+                <h1>Vous faites partie de <span id="house-share-name">[Nom Colocation]</span></h1>
             </div>
             <div class="profile">
-                <span class="profile-email">[email]</span>
+                <span id="profile-email" class="profile-email">[email@]</span>
                 <div class="profile-icon">
                     <a href="user-info.html">
-                        <img src="../assets/profile-icon.png" alt="Profile">
+                        <img src="../assets/profile-icon.png" alt="Profil">
                     </a>
                 </div>
             </div>
@@ -51,24 +51,33 @@
                     <span class="icon">≡</span>
                     <h2>Membres</h2>
                 </div>
-                <div class="card-content">
-                    <p>Chargement des membres...</p>
+                <div class="card-content" id="members-list">
+                    <p>[Prénom] [NOM] [email@] [N°Tél]</p>
                 </div>
-                <button class="toggle">Afficher Tout</button>
+                <button class="toggle" id="toggle-members">Afficher Tout</button>
             </div>
 
             <div class="card payements-container">
                 <div class="card-header">
                     <span class="icon">≡</span>
-                    <h2>Achats</h2>
+                    <h2>Achats (ordre décroissant)</h2>
                 </div>
-                <div class="card-content">
-                    <p>Chargement des achats...</p>
+                <div class="card-content" id="purchases-list">
+                    <p>[Intitulé] [Montant] [Date] [Prénom] [NOM]</p>
                 </div>
-                <button class="toggle">Afficher Tout</button>
+                <button class="toggle" id="toggle-purchases">Afficher Tout</button>
             </div>
         </div>
     </div>
 </div>
+
+<footer>
+    <div class="footer-content">
+        <div class="validators">
+            <a href="https://validator.w3.org/nu/?doc=[URL]" target="_blank">HTML Validation</a>
+            <a href="https://jigsaw.w3.org/css-validator/validator?uri=[URL]" target="_blank">CSS Validation</a>
+        </div>
+    </div>
+</footer>
 </body>
 </html>
