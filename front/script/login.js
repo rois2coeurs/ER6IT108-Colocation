@@ -1,7 +1,6 @@
 const loginForm = document.getElementById('login-form');
 const errorElem = document.getElementById('error');
 
-
 async function checkToken() {
     if (localStorage.getItem('token')) {
         const res = await fetch('/validate', {

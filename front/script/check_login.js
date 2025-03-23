@@ -1,13 +1,9 @@
+import {ApiClient} from "/front/script/api_client.js";
+
+const api = new ApiClient();
+
 async function checkLogin() {
-    if (!localStorage.getItem('token')) {
-        window.location.href = 'login.html';
-        return;
-    }
-    const res = await fetch('/validate', {
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-    });
+    const res = await api.get("/validate");
     if (!res.ok) {
         localStorage.removeItem('token');
         window.location.href = 'login.html';

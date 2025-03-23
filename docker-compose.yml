@@ -11,6 +11,9 @@ services:
         - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    profiles:
+      - dev
+      - deploy
 
   adminer:
     profiles:
@@ -19,6 +22,25 @@ services:
     restart: always
     ports:
       - "8080:8080"
+
+  frontend:
+    build: ./front
+    restart: always
+    ports:
+      - "3000:80"
+    profiles:
+      - deploy
+
+  backend:
+    build: ./back
+    restart: always
+    ports:
+      - "5000:3000"
+    depends_on:
+      - db
+    profiles:
+      - deploy
+
 
 
 volumes:

@@ -1,17 +1,11 @@
+import {ApiClient} from "/front/script/api_client.js";
 const url = new URL(window.location.href);
 const id = url.searchParams.get('id');
-
 if (!id) window.location.href = 'index.html';
+const api = new ApiClient();
 
 async function loadData(id) {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
-    const res = await fetch(`/house-share/${id}`, {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    });
+    const res = await api.get(`/house-share/${id}`);
 
     if (!res.ok) {
         window.location.href = 'house_share_index.html';
@@ -22,6 +16,5 @@ async function loadData(id) {
 
     console.log(data);
 }
-
 
 loadData(id);
