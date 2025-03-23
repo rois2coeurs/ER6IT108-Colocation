@@ -25,7 +25,7 @@ jobs:
         with:
           context: "{{defaultContext}}:front"
           push: true
-          tags: ghcr.io/rois2coeurs/coloc:latest
+          tags: ghcr.io/rois2coeurs/coloc-front:latest
           platforms: linux/amd64,linux/arm64
     -
         name: Build and push backend
@@ -33,6 +33,6 @@ jobs:
         with:
           context: "{{defaultContext}}:back"
           push: true
-          tags: ghcr.io/rois2coeurs/coloc:latest
+          tags: ghcr.io/rois2coeurs/coloc-back:latest
           platforms: linux/amd64,linux/arm64
     
