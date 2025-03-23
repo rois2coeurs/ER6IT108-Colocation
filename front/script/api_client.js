@@ -1,7 +1,9 @@
+const { file_extension, api_url } = JSON.parse(localStorage.getItem('config'));
+
 export class ApiClient {
-    constructor(baseUrl = "http://localhost:8090", redirect = "login.html") {
-        this.baseUrl = baseUrl;
-        this.redirect =  redirect;
+    constructor() {
+        this.baseUrl = api_url ? api_url : 'https://api.coloc.valentinraillard.fr';
+        this.redirect =  file_extension ? "login.html" : "login";
     }
 
     async request(method, path, data = null) {

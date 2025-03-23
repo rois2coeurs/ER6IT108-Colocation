@@ -1,3 +1,5 @@
+name: "coloc"
+
 services:
   db:
     image: postgres
