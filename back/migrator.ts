@@ -5,7 +5,7 @@ applyMigrations();
 
 async function applyMigrations() {
     const currentMigration = await getCurrentMigration();
-    console.log("Current database version: " + currentMigration);
+    console.log("\nCurrent database version: " + currentMigration);
     const allMigrations = await getAllMigrations();
     const migrationsToApply = allMigrations.filter(migration => migration.split("_")[0] > currentMigration).sort((a, b) => a.localeCompare(b));
     console.log("Migrations to apply: " + migrationsToApply.length);
@@ -17,7 +17,7 @@ async function applyMigrations() {
         await applyMigration(migration);
         console.log("OK!");
     }
-    console.log("The database is up to date!");
+    console.log("The database is up to date!\n");
 }
 
 async function applyMigration(migration: string) {
