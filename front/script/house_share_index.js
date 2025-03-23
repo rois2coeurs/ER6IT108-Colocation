@@ -1,13 +1,11 @@
 const createColocationForm = document.getElementById('create-colocation-form');
 
+import {ApiClient} from "/front/script/api_client.js";
+
+const api = new ApiClient();
+
 createColocationForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
-
-    if (!token) {
-        alert('Veuillez vous connecter pour créer une colocation');
-        return;
-    }
 
     const formData = new FormData(createColocationForm);
     const data = {
@@ -16,14 +14,7 @@ createColocationForm.addEventListener('submit', async (e) => {
     };
 
     try {
-        const res = await fetch('http://localhost:8090/house-share', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(data)
-        });
+        const res = await api.post('/house-share', data);
 
         const resData = await res.json();
 
@@ -70,15 +61,7 @@ function displayInvitations(invitations) {
 
 
 async function redirectIfHasHouseShare() {
-    const token = localStorage.getItem('token');
-
-    if (!token) return;
-
-    const res = await fetch('/me/house-share', {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    });
+    const res = await api.get('/me/house-share');
     const resData = await res.json();
     if (res.ok && resData.houseShareId) {
         window.location.href = 'house_share.html?id=' + resData.houseShareId;
