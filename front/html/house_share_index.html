@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,7 +16,7 @@
                 <a href="index.html">Accueil</a>
             </div>
             <div class="nav-item active">
-                <a href="house_share.html">Colocation</a>
+                <a href="house_share_index.html">Colocation</a>
             </div>
             <div class="nav-item">
                 <a href="shared_fund.html">Cagnotte</a>
@@ -36,7 +36,7 @@
                 <h1>Colocation</h1>
             </div>
             <div class="profile">
-                <span class="profile-email">[email]</span>
+                <span class="profile-email" id="user-email">[email]</span>
                 <div class="profile-icon">
                     <a href="user-info.html">
                         <img src="../assets/profile-icon.png" alt="Profile">
@@ -49,20 +49,20 @@
             <div class="card creation-container">
                 <div class="card-header">
                     <span class="icon">+</span>
-                    <h2>Crée une nouvelle collocation</h2>
+                    <h2>Créer une nouvelle colocation</h2>
                 </div>
                 <div class="card-content">
                     <form id="create-colocation-form">
                         <div class="input-group">
                             <label for="name">Nom:</label>
-                            <input type="text" name="name" id="name" placeholder="Nom de la collocation..." required>
+                            <input type="text" name="name" id="name" placeholder="Nom de la colocation..." required>
                         </div>
                         <div class="input-group">
                             <label for="address">Adresse:</label>
-                            <input type="text" name="address" id="address" placeholder="Adresse de la collocation..."
+                            <input type="text" name="address" id="address" placeholder="Adresse de la colocation..."
                                    required>
                         </div>
-                        <button type="submit" class="submit">Créer la collocation</button>
+                        <button type="submit" class="submit">Créer la colocation</button>
                     </form>
                 </div>
             </div>
@@ -70,10 +70,12 @@
             <div class="card invitation-container">
                 <div class="card-header">
                     <span class="icon">≡</span>
-                    <h2>Invitations en attente</h2>
+                    <h2>Rejoindre une colocation existante</h2>
                 </div>
                 <div class="card-content">
-                    <p>Chargement des invitations...</p>
+                    <div id="house-shares-list">
+                        <p>Chargement des invitations...</p>
+                    </div>
                 </div>
             </div>
         </div>
