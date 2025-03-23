@@ -3,6 +3,12 @@ import houseShareRoutes from "./routes/houseShareRoutes.ts";
 import {SafeDisplayError} from "./errors/SafeDisplayError.ts";
 import usersRoutes from "./routes/usersRoutes.ts";
 
+Bun.spawn(["bun", "run", "migrator.ts"], {
+    stdin: "inherit",
+    stdout: "inherit",
+    stderr: "inherit",
+});
+
 Bun.serve({
     port: 3000,
     routes: {
