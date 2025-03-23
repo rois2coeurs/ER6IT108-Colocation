@@ -13,7 +13,7 @@ jobs:
         name: Login to GitHub registry
         uses: docker/login-action@v3
         with:
-          username: ${{ github.actor }}
+          username: rois2coeurs
           password: ${{ secrets.GITHUB_TOKEN }}
     -
         name: Set up Docker Buildx
