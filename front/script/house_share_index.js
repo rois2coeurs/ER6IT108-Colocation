@@ -1,20 +1,29 @@
 const createColocationForm = document.getElementById('create-colocation-form');
 
-import {ApiClient} from "/front/script/api_client.js";
-
-const api = new ApiClient();
-
 createColocationForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        alert('Veuillez vous connecter pour créer une colocation');
+        return;
+    }
 
     const formData = new FormData(createColocationForm);
     const data = {
         name: formData.get('name'),
         address: formData.get('address')
     };
-
+    
     try {
-        const res = await api.post('/house-share', data);
+        const res = await fetch('http://localhost:8090/house-share', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+        });
 
         const resData = await res.json();
 
@@ -25,43 +34,52 @@ createColocationForm.addEventListener('submit', async (e) => {
             alert(`Erreur: ${resData.error || 'Une erreur est survenue'}`);
         }
     } catch (error) {
-        console.error('Error creating colocation:', error);
-        alert('Une erreur est survenue lors de la création de la colocation');
+        console.error('Erreur:', error);
+        alert(`Erreur: ${error.message}`);
     }
-});
-
-function fetchInvitations() {
 }
 
-function displayInvitations(invitations) {
-    if (!invitations || invitations.length === 0) {
-        invitationContainer.innerHTML = '<p>Aucune invitation en attente</p>';
+async function joinHouseShare(houseId) {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+        alert('Veuillez vous connecter pour rejoindre une colocation');
         return;
     }
-
-    let invitationsHTML = '';
-
-    invitations.forEach(invitation => {
-        invitationsHTML += `
-            <div class="invitation-item" data-id="${invitation.id}">
-                <div class="invitation-text">
-                    Invitation à rejoindre "${invitation.colocation_name}" à ${invitation.colocation_address}
-                </div>
-                <div class="invitation-actions">
-                    <button class="accept-invite" onclick="handleInvitation(${invitation.id}, 'accept')">✓</button>
-                    <button class="decline-invite" onclick="handleInvitation(${invitation.id}, 'decline')">✗</button>
-                </div>
-            </div>
-            <hr>
-        `;
-    });
-
-    invitationContainer.innerHTML = invitationsHTML;
+    
+    try {
+        const response = await fetch(`/house-share/${houseId}/members`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({}) // Pas besoin d'envoyer l'email car nous utilisons l'utilisateur authentifié
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Erreur lors de la tentative de rejoindre la colocation');
+        }
+        alert('Vous avez rejoint la colocation avec succès!');
+        window.location.href = `house_share.html?id=${houseId}`;
+        
+    } catch (error) {
+        console.error('Erreur:', error);
+        alert(`Erreur: ${error.message}`);
+    }
 }
 
-
 async function redirectIfHasHouseShare() {
-    const res = await api.get('/me/house-share');
+    const token = localStorage.getItem('token');
+
+    if (!token) return;
+
+    const res = await fetch('/me/house-share', {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
     const resData = await res.json();
     if (res.ok && resData.houseShareId) {
         window.location.href = 'house_share.html?id=' + resData.houseShareId;

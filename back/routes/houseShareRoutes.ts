@@ -66,20 +66,31 @@ export default {
         POST: async (req: BunRequest<"/house-share/:id/members">) => {
             const userId = AuthHelper.checkAuth(req);
             const {id} = req.params;
-            if (!userId) throw new SafeDisplayError("Missing fields", 400);
+            const house = await getHouseShare(Number(id));
 
-            await addHouseShareMember(Number(userId), Number(id));
+            if (!house[0]) throw new SafeDisplayError("house-share not found!", 404);
+            if (house[0].manager_id !== userId) throw new UnauthorizedError("Only the manager can add members");
+            const {email} = await req.json();
+
+            if (!email) throw new SafeDisplayError("Missing email field", 400);
+            const user = await getUserByEmail(email);
+            if (!user[0]) throw new SafeDisplayError("User not found", 404);
+            await addHouseShareMember(user[0].id, Number(id));
 
             return Response.json({message: "User added to house-share"}, {status: 201});
         },
         PUT: async (req: BunRequest<"/house-share/:id/members">) => {
             const userId = AuthHelper.checkAuth(req);
             const {id} = req.params;
-            if (!userId) throw new SafeDisplayError("Missing fields", 400);
+            const house = await getHouseShare(Number(id));
 
-            await updateHouseShareMember(Number(userId), Number(id));
+            if (!house[0]) throw new SafeDisplayError("house-share not found!", 404);
+            const membership = await checkMembership(userId, Number(id));
+            if (!membership[0]) throw new SafeDisplayError("You are not a member of this house-share", 400);
+            if (membership[0].exit_date) throw new SafeDisplayError("You have already left this house-share", 400);
+            await updateHouseShareMember(userId, Number(id));
 
-            return Response.json({message: "User added to house-share"}, {status: 201});
+            return Response.json({message: "Successfully left the house-share"}, {status: 200});
         }
     }
 }
@@ -115,19 +126,33 @@ async function updateHouseShare(name: string, address: string, id: number) {
 }
 
 async function getHouseShareMembers(id: number) {
-    await sql`SELECT *
+    return sql`SELECT users.id, users.name, users.firstname, users.mail, users.phone_number, 
+                      stays.entry_date, stays.exit_date
             FROM stays
-            INNER JOIN users ON user_id = users.id
-            WHERE house_share_id = ${id};`;
+            INNER JOIN users ON stays.user_id = users.id
+            WHERE stays.house_share_id = ${id};`;
+}
+
+async function getUserByEmail(email: string) {
+    return sql`SELECT *
+               FROM users 
+               WHERE mail = ${email};`;
+}
+
+async function checkMembership(userId: number, houseId: number) {
+    return sql`SELECT *
+               FROM stays
+               WHERE user_id = ${userId} AND house_share_id = ${houseId}
+               LIMIT 1;`;
 }
 
 async function addHouseShareMember(userId: number, id: number) {
     await sql`INSERT INTO stays (entry_date, user_id, house_share_id)
-                VALUES (${new Date().toLocaleString()},${userId},${id});`;
+                VALUES (CURRENT_DATE, ${userId}, ${id});`;
 }
 
 async function updateHouseShareMember(userId: number, id: number) {
     await sql`UPDATE stays 
-            SET exit_date = ${new Date().toLocaleString()}
-            WHERE house_share_id = ${id} AND user_id = ${userId};`; 
+            SET exit_date = CURRENT_DATE
+            WHERE house_share_id = ${id} AND user_id = ${userId} AND exit_date IS NULL;`;
 }
