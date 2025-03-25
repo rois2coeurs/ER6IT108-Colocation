@@ -77,7 +77,9 @@ export default {
             await addHouseShareMember(Number(user[0].id), Number(id));
 
             return Response.json({message: "User added to house-share"}, {status: 201});
-        },
+        }
+    },
+    '/house-share/:id/members/:memberId' : {
         PUT: async (req: BunRequest<"/house-share/:id/members/:memberId">) => {
             const userId = AuthHelper.checkAuth(req);
             const {id} = req.params;
