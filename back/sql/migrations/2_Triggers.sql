@@ -1,26 +1,15 @@
 CREATE FUNCTION stay_dates_check() RETURNS TRIGGER AS
 $$
 BEGIN
-    -- An entry_date must be before exit_date
-    IF NEW.exit_date IS NOT NULL AND NEW.exit_date < NEW.entry_date THEN
-        RAISE EXCEPTION 'exit_date must be greater than entry_date';
+    IF EXISTS(SELECT id
+              FROM stays
+              WHERE NEW.user_id = user_id
+                AND ((NEW.exit_date IS NULL AND exit_date IS NOT NULL)
+                  OR (NEW.exit_date IS NOT NULL AND NEW.exit_date BETWEEN entry_date AND exit_date)
+                  OR (NEW.entry_date BETWEEN entry_date AND exit_date)))
+    THEN
+        RAISE EXCEPTION 'A stay already exists for this period or user is already staying somewhere else';
     END IF;
-    -- A user can't stay in two places at the same time
-    IF NEW.exit_date IS NULL AND EXISTS((SELECT id
-                                         FROM stays
-                                         WHERE user_id = NEW.user_id
-                                           AND (exit_date IS NULL OR exit_date >= NEW.exit_date))) THEN
-        RAISE EXCEPTION 'User is already staying somewhere else';
-    END IF;
-    -- A user can't stay in a place in the past compared to his last stay
-    -- OLD.entry_date is NULL if it's an INSERT
-    IF OLD.entry_date IS NULL AND NEW.entry_date <
-                                  (SELECT COALESCE(MAX(exit_date), '1970-01-01'::DATE) -- If there is no previous stay, we consider the epoch
-                                   FROM stays
-                                   WHERE user_id = NEW.user_id) THEN
-        RAISE EXCEPTION 'User can''t stay in a place in the past compared to his last stay';
-    END IF;
-    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -29,6 +18,9 @@ CREATE TRIGGER stay_dates_check
     ON stays
     FOR EACH ROW
 EXECUTE FUNCTION stay_dates_check();
+
+ALTER TABLE stays
+    ADD CHECK ( entry_date < exit_date OR exit_date IS NULL );
 
 -- A house share can have no manager if it's an ended house share
 ALTER TABLE house_share
