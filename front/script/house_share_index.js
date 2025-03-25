@@ -13,7 +13,7 @@ createColocationForm.addEventListener('submit', async (e) => {
 });
 
 
-function displayUserEmail() {
+async function displayUserEmail() {
     const token = localStorage.getItem('token');
 
     if (!token) {
