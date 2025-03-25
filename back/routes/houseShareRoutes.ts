@@ -66,16 +66,21 @@ export default {
         POST: async (req: BunRequest<"/house-share/:id/members">) => {
             const userId = AuthHelper.checkAuth(req);
             const {id} = req.params;
-            if (!userId) throw new SafeDisplayError("Missing fields", 400);
-
             await addHouseShareMember(Number(userId), Number(id));
+
+            const {email} = await req.json();
+            if (!email) throw new SafeDisplayError("Missing email", 400);
+
+            const user = await sql`SELECT id FROM users WHERE email = ${email};`;
+            if (!user[0]) throw new SafeDisplayError("User not found", 404);
+
+            await addHouseShareMember(Number(user[0].id), Number(id));
 
             return Response.json({message: "User added to house-share"}, {status: 201});
         },
-        PUT: async (req: BunRequest<"/house-share/:id/members">) => {
+        PUT: async (req: BunRequest<"/house-share/:id/members/:memberId">) => {
             const userId = AuthHelper.checkAuth(req);
             const {id} = req.params;
-            if (!userId) throw new SafeDisplayError("Missing fields", 400);
 
             await updateHouseShareMember(Number(userId), Number(id));
 
@@ -111,11 +116,11 @@ async function updateHouseShare(name: string, address: string, id: number) {
     await sql`UPDATE house_share
               SET name    = ${name},
                   address = ${address}
-              WHERE id = ${id};`;
+                  WHERE id = ${id};`;
 }
 
 async function getHouseShareMembers(id: number) {
-    await sql`SELECT *
+    return sql`SELECT users.user_id, users.name, users.firstname, users.entry_date, users.exit_date
             FROM stays
             INNER JOIN users ON user_id = users.id
             WHERE house_share_id = ${id};`;
@@ -129,5 +134,5 @@ async function addHouseShareMember(userId: number, id: number) {
 async function updateHouseShareMember(userId: number, id: number) {
     await sql`UPDATE stays 
             SET exit_date = ${new Date().toLocaleString()}
-            WHERE house_share_id = ${id} AND user_id = ${userId};`; 
+            WHERE house_share_id = ${id} AND user_id = ${userId} AND exit_date IS NULL;`; 
 }
