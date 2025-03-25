@@ -87,7 +87,6 @@ export default {
             if (!house[0]) throw new SafeDisplayError("house-share not found!", 404);
             const membership = await checkMembership(userId, Number(id));
             if (!membership[0]) throw new SafeDisplayError("You are not a member of this house-share", 400);
-            if (membership[0].exit_date) throw new SafeDisplayError("You have already left this house-share", 400);
             await updateHouseShareMember(userId, Number(id));
 
             return Response.json({message: "Successfully left the house-share"}, {status: 200});
@@ -142,7 +141,7 @@ async function getUserByEmail(email: string) {
 async function checkMembership(userId: number, houseId: number) {
     return sql`SELECT *
                FROM stays
-               WHERE user_id = ${userId} AND house_share_id = ${houseId}
+               WHERE user_id = ${userId} AND house_share_id = ${houseId} AND exit_date IS NULL
                LIMIT 1;`;
 }
 
