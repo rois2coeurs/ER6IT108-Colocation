@@ -1,7 +1,19 @@
-const createColocationForm = document.getElementById('create-colocation-form');
 
+const createColocationForm = document.getElementById('create-colocation-form');
+const houseSharesList = document.getElementById('house-shares-list');
+const userEmailElement = document.getElementById('user-email');
+    
+await redirectIfHasHouseShare();
+await loadHouseShares();
+displayUserEmail();
+    
 createColocationForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    await createColocation(e.target);
+});
+
+
+function displayUserEmail() {
     const token = localStorage.getItem('token');
 
     if (!token) {
