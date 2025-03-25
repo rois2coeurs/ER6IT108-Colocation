@@ -122,7 +122,7 @@ async function updateHouseShare(name: string, address: string, id: number) {
 }
 
 async function getHouseShareMembers(id: number) {
-    return sql`SELECT users.user_id, users.name, users.firstname, users.entry_date, users.exit_date
+    return sql`SELECT users.id, users.name, users.firstname, users.entry_date, users.exit_date
             FROM stays
             INNER JOIN users ON user_id = users.id
             WHERE house_share_id = ${id};`;
