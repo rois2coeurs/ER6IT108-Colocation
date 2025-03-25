@@ -1,3 +1,5 @@
+import {ApiClient} from "/front/script/api_client.js";
+const api = new ApiClient();
 
 const createColocationForm = document.getElementById('create-colocation-form');
 const houseSharesList = document.getElementById('house-shares-list');
@@ -9,7 +11,7 @@ displayUserEmail();
     
 createColocationForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    await createColocation(e.target);
+    await createHouseShare(e.target);
 });
 
 
@@ -45,6 +47,30 @@ async function displayUserEmail() {
         } else {
             alert(`Erreur: ${resData.error || 'Une erreur est survenue'}`);
         }
+    } catch (error) {
+        console.error('Erreur:', error);
+        alert(`Erreur: ${error.message}`);
+    }
+}
+
+async function createHouseShare(houseId) {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+        alert('Veuillez vous connecter pour rejoindre une colocation');
+        return;
+    }
+    
+    try {
+        const response = await api.get(`/house-share/${houseId}`)
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Erreur lors de la tentative de création de la colocation');
+        }
+        alert('Vous avez créée la colocation avec succès!');
+        window.location.href = `house_share.html?id=${houseId}`;
+        
     } catch (error) {
         console.error('Erreur:', error);
         alert(`Erreur: ${error.message}`);
