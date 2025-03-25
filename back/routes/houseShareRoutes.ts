@@ -74,7 +74,7 @@ export default {
             const user = await sql`SELECT id FROM users WHERE email = ${email};`;
             if (!user[0]) throw new SafeDisplayError("User not found", 404);
 
-            await addHouseShareMember(Number(user), Number(id));
+            await addHouseShareMember(Number(user[0].id), Number(id));
 
             return Response.json({message: "User added to house-share"}, {status: 201});
         },
