@@ -16,5 +16,5 @@ async function getUserHouseShare(userId: number) {
     const house = await sql`SELECT house_share_id
                             FROM stays
                             WHERE user_id = ${userId}`;
-    return house[0].house_share_id;
+    return house[0]?.house_share_id;
 }
