@@ -1,4 +1,4 @@
-CREATE FUNCTION stay_dates_check() RETURNS TRIGGER AS
+CREATE OR REPLACE FUNCTION stay_dates_check() RETURNS TRIGGER AS
 $$
 BEGIN
     IF EXISTS(SELECT id
@@ -6,7 +6,8 @@ BEGIN
               WHERE NEW.user_id = user_id
                 AND ((NEW.exit_date IS NULL AND exit_date IS NOT NULL)
                   OR (NEW.exit_date IS NOT NULL AND NEW.exit_date BETWEEN entry_date AND exit_date)
-                  OR (NEW.entry_date BETWEEN entry_date AND exit_date)))
+                  OR (NEW.entry_date BETWEEN entry_date AND exit_date)
+                  OR (NEW.entry_date > entry_date AND exit_date IS NULL)))
     THEN
         RAISE EXCEPTION 'A stay already exists for this period or user is already staying somewhere else';
     END IF;
@@ -78,4 +79,5 @@ CREATE TRIGGER purchases_checks
     FOR EACH ROW
 EXECUTE FUNCTION purchases_checks();
 
-ALTER TABLE shared_fund ADD UNIQUE (house_share_id);
+ALTER TABLE shared_fund
+    ADD UNIQUE (house_share_id);
