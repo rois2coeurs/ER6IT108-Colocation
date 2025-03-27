@@ -1,4 +1,4 @@
-const { api_url } = JSON.parse(localStorage.getItem('config'));
+const { api_url } = JSON.parse(localStorage.getItem('config') || '{}');
 
 export class ApiClient {
     constructor() {
