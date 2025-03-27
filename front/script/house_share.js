@@ -1,4 +1,4 @@
-import {ApiClient} from "/front/script/api_client.js"; // template API
+import {ApiClient} from "./api_client.js"; // template API
 const url = new URL(window.location.href);
 const id = url.searchParams.get('id');
 if (!id) window.location.href = 'index.html';
