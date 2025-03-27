@@ -10,6 +10,7 @@ BEGIN
     THEN
         RAISE EXCEPTION 'A stay already exists for this period or user is already staying somewhere else';
     END IF;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -29,3 +30,52 @@ ALTER TABLE house_share
 ALTER TABLE house_share
     ADD CONSTRAINT unique_manager_id UNIQUE (manager_id);
 
+ALTER TABLE contributions
+    ADD CHECK ( amount > 0 );
+ALTER TABLE transfers
+    ADD CHECK ( amount > 0 ),
+    ADD CHECK ( sender_id != receiver_id );
+
+CREATE FUNCTION contributions_checks() RETURNS TRIGGER AS
+$$
+BEGIN
+    IF ((SELECT house_share_id
+         FROM shared_fund
+         WHERE id = NEW.shared_fund_id) NOT IN
+        (SELECT house_share_id FROM stays WHERE user_id = NEW.user_id AND NEW.date BETWEEN exit_date AND entry_date))
+    THEN
+        RAISE EXCEPTION 'The user cannot contribute to a shared fund if he is not staying in the house share';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER contributions_checks
+    BEFORE INSERT OR UPDATE
+    ON contributions
+    FOR EACH ROW
+EXECUTE FUNCTION contributions_checks();
+
+CREATE FUNCTION purchases_checks() RETURNS TRIGGER AS
+$$
+BEGIN
+    IF (SELECT house_share.id
+        FROM shared_fund
+                 INNER JOIN house_share ON shared_fund.house_share_id = house_share.id
+        WHERE shared_fund.id = NEW.shared_fund_id)
+        NOT IN
+       (SELECT house_share_id
+        FROM stays
+        WHERE user_id = NEW.user_id
+          AND NEW.date BETWEEN exit_date AND entry_date) THEN
+        RAISE EXCEPTION 'The user cannot make a purchase if he is not staying in the house share';
+    end if;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER purchases_checks
+    BEFORE INSERT OR UPDATE
+    ON purchases
+    FOR EACH ROW
+EXECUTE FUNCTION purchases_checks();
+
+ALTER TABLE shared_fund ADD UNIQUE (house_share_id);
