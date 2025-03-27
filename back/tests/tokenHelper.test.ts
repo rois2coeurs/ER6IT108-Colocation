@@ -30,7 +30,7 @@ describe("TokenHelper Test", () => {
     })
 
     test("TokenHelper.checkToken with fake Token", () => {
-        const fakeToken = "13286fe57ab62fb2bc5ded6e208624e814d2a44e8a78f3c9674647e1e5cfba81";
+        const fakeToken = "MySuperFakeToken";
         const userId = TokenHelper.checkToken(fakeToken);
         expect(userId).toBeNull();
     })
