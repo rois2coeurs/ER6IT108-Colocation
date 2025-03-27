@@ -5,8 +5,8 @@ BEGIN
               FROM stays
               WHERE NEW.user_id = user_id
                 AND ((NEW.exit_date IS NULL AND exit_date IS NOT NULL)
-                  OR (NEW.exit_date IS NOT NULL AND NEW.exit_date BETWEEN entry_date AND exit_date)
-                  OR (NEW.entry_date BETWEEN entry_date AND exit_date)
+                  OR (NEW.exit_date IS NOT NULL AND NEW.exit_date BETWEEN entry_date AND COALESCE(exit_date, now()))
+                  OR (NEW.entry_date BETWEEN entry_date AND COALESCE(exit_date, now()))
                   OR (NEW.entry_date > entry_date AND exit_date IS NULL)))
     THEN
         RAISE EXCEPTION 'A stay already exists for this period or user is already staying somewhere else';
@@ -37,16 +37,20 @@ ALTER TABLE transfers
     ADD CHECK ( amount > 0 ),
     ADD CHECK ( sender_id != receiver_id );
 
-CREATE FUNCTION contributions_checks() RETURNS TRIGGER AS
+CREATE OR REPLACE FUNCTION contributions_checks() RETURNS TRIGGER AS
 $$
 BEGIN
     IF ((SELECT house_share_id
          FROM shared_fund
          WHERE id = NEW.shared_fund_id) NOT IN
-        (SELECT house_share_id FROM stays WHERE user_id = NEW.user_id AND NEW.date BETWEEN exit_date AND entry_date))
+        (SELECT house_share_id
+         FROM stays
+         WHERE user_id = NEW.user_id
+           AND NEW.date BETWEEN entry_date AND COALESCE(exit_date, now())))
     THEN
         RAISE EXCEPTION 'The user cannot contribute to a shared fund if he is not staying in the house share';
     END IF;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -67,9 +71,10 @@ BEGIN
        (SELECT house_share_id
         FROM stays
         WHERE user_id = NEW.user_id
-          AND NEW.date BETWEEN exit_date AND entry_date) THEN
+          AND NEW.date BETWEEN entry_date AND COALESCE(exit_date, now())) THEN
         RAISE EXCEPTION 'The user cannot make a purchase if he is not staying in the house share';
     end if;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 

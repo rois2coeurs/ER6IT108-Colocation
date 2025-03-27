@@ -5,3 +5,7 @@ DROP TABLE IF EXISTS purchases;
 DROP TABLE IF EXISTS shared_fund;
 DROP TABLE IF EXISTS house_share;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS migrationversion;
+DROP FUNCTION IF EXISTS purchases_checks;
+DROP FUNCTION IF EXISTS contributions_checks;
+DROP FUNCTION IF EXISTS purchases_checks;
