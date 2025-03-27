@@ -1,5 +1,5 @@
-import {randomUUIDv7} from "bun";
-const TOKEN_MAX_AGE = 1000 * 60 * 60 * 12; // 12 hours
+import {randomBytes} from 'node:crypto';
+const TOKEN_MAX_AGE = 1000 * 60 * 60 * 8; // 8 hours
 
 let tokens: Array<Token> = [];
 
@@ -8,7 +8,7 @@ export class TokenHelper {
         const userToken = tokens.find(t => t.getUserId() === userId);
         if (userToken) tokens = tokens.filter(t => t.getToken() !== userToken.getToken());
 
-        const token = randomUUIDv7();
+        const token = randomBytes(32).toString('hex');
         tokens.push(new Token(token, userId));
         setTimeout(() => {
             tokens = tokens.filter(t => t.getToken() !== token);
