@@ -5,7 +5,9 @@ const db = new SQL({
     url: process.env.POSTGRES_TEST_URL
 });
 
-describe("Database", () => {
+const IsGithubActions = process.env.GITHUB_ACTIONS === "true";
+
+describe.skipIf(IsGithubActions)("Database", () => {
     test("Migration and seeding", async () => {
         const proc = Bun.spawn(["bun", "run", "migrator.ts", "--test", "--seed"]);
         const res = await proc.exited;
