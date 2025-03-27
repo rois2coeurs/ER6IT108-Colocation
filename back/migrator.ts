@@ -1,7 +1,69 @@
-import {sql} from "bun";
+import {SQL} from "bun";
 import {readdir} from "node:fs/promises";
+import {parseArgs} from "util";
 
-applyMigrations();
+const {values} = parseArgs({
+    args: Bun.argv,
+    options: {
+        test: {
+            type: 'boolean',
+            short : 't'
+        },
+        seed: {
+            type: 'boolean',
+            short : 's'
+        },
+        delete: {
+            type: 'boolean',
+            short : 'd'
+        }
+    },
+    strict: true,
+    allowPositionals: true,
+});
+
+let sql = new SQL({
+    url: process.env.POSTGRES_URL
+});
+
+if (values.test) {
+    console.log("Migrator using test database");
+    sql = new SQL({
+        url: process.env.POSTGRES_TEST_URL
+    });
+}
+
+if (values.delete) {
+    console.log("Are you sure you want to delete the database? (yes/no)");
+    for await (const line of console) {
+        if (line === "yes" || line === "y") {
+            break;
+        }
+        console.log("Database deletion cancelled!");
+        process.exit(0);
+    }
+    console.log("Migrator is deleting the database");
+    await sql.begin(async tx => {
+        await tx.file("./sql/deleter.sql");
+    });
+    console.log("Database deleted!");
+    process.exit(0);
+}
+
+applyMigrations().then(async () => {
+    if (values.seed) {
+        await seedDatabase();
+    }
+    process.exit(0);
+})
+
+async function seedDatabase() {
+    console.log("Migrator is seeding the database");
+    await sql.begin(async tx => {
+        await tx.file("./sql/seeder.sql");
+    });
+    console.log("Database seeded!");
+}
 
 async function applyMigrations() {
     const currentMigration = await getCurrentMigration();
@@ -36,7 +98,8 @@ async function getCurrentMigration() {
     if (await migrationTableExists()) {
         const result = await sql`SELECT version
                                  FROM migrationVersion
-                                 ORDER BY version DESC LIMIT 1;`;
+                                 ORDER BY version DESC
+                                 LIMIT 1;`;
         return result[0].version;
     } else {
         await createMigrationTable();
