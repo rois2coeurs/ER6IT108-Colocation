@@ -68,6 +68,19 @@ describe("Database", () => {
         }
     });
 
+    test("Error while inserting a stay for 2025-01-08 -> null", async () => {
+        try {
+            const insert = await db`
+                INSERT INTO stays (entry_date, user_id, house_share_id)
+                VALUES ('2025-01-08', 1, 2)
+                RETURNING *;
+            `;
+            expect(insert.count).toBe(0);
+        } catch (e: any) {
+            expect(e.message).toBe("A stay already exists for this period or user is already staying somewhere else");
+        }
+    });
+
     test("Deletion", async () => {
         const proc = Bun.spawn(["bun", "run", "migrator.ts", "--test", "--delete"]);
         const res = await proc.exited;
