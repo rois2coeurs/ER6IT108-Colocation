@@ -1,0 +1,215 @@
+@import "var.css";
+@import "font.css";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #f2f2f2;
+    height: 100vh;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+input {
+    border-radius: 5px;
+    border: 1px solid #A19C9C;
+    background-color: #fff;
+    padding: 10px;
+    width: 100%;
+    font-size: 16px;
+}
+
+/* Main Layout */
+.main-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar Navigation */
+.sidebar {
+    width: 250px;
+    background-color: #0e1419;
+    color: white;
+    padding-top: 40px;
+}
+
+.nav-item {
+    padding: 15px 20px;
+    font-size: 18px;
+    transition: background-color 0.3s;
+}
+
+.nav-item:hover, .nav-item.active {
+    border-bottom: 2px solid #e6505c;
+}
+
+/* Content Area */
+.content-area {
+    flex: 1;
+    padding: 20px;
+}
+
+/* Header with profile */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.title h1 {
+    color: #e6505c;
+    font-size: x-large;
+    text-decoration: underline;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-email {
+    font-size: 16px;
+}
+
+.profile-icon {
+    width: 50px;
+    height: 50px;
+    background-color: var(--third-color);
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+/* Card Containers */
+.utility-container {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.card {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 40%;
+    padding: 40px;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.icon {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.card-header h2 {
+    font-size: 20px;
+    font-weight: normal;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.submit {
+    background-color: #b48c94;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 15px;
+    transition: background-color 0.3s;
+}
+
+.submit:hover {
+    background-color: #e6505c;
+}
+
+/* Invitation styles */
+.invitation-item {
+    padding: 10px 0;
+}
+
+.invitation-text {
+    margin-bottom: 10px;
+}
+
+.invitation-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.accept-invite, .decline-invite {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.accept-invite {
+    background-color: #b48c94;
+    color: white;
+}
+
+.decline-invite {
+    background-color: #ccc;
+    color: black;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 10px 0;
+}
+
+/* profile button */
+
+.profile-icon {
+    width: 50px;
+    height: 50px;
+    background-color: var(--third-color);
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.profile-icon:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.profile-icon a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.profile-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
