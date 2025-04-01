@@ -8,6 +8,7 @@ async function checkToken() {
         });
         if (!res.ok) {
             localStorage.removeItem('token');
+            localStorage.removeItem('user');
         } else {
             window.location.href = "house_share.html";
         }
