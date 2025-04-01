@@ -24,18 +24,25 @@ export class AuthHelper {
         const {email, first_name, name, password, phone_number} = await req.json();
         if (!email || !first_name || !name || !password || !phone_number) throw new SafeDisplayError("Missing fields", 400);
         if (!checkPassword(password)) throw new SafeDisplayError("Password too weak", 400);
+        if (!checkPhoneNumber(phone_number)) throw new SafeDisplayError("Invalid phone number", 400);
         const user = await getUserByEmail(email);
         if (user[0]) throw new SafeDisplayError("User already exists", 400);
-        const new_user = await insertUser(email, first_name, name, password, phone_number);
-        if (!new_user[0]) throw new SafeDisplayError("Error creating user", 500);
-        return TokenHelper.createToken(new_user[0].id);
+        try {
+            const new_user = await insertUser(email, first_name, name, password, phone_number);
+            return TokenHelper.createToken(new_user[0].id);
+        } catch (e) {
+            throw new SafeDisplayError("Error while creating user", 500);
+        }
     }
 }
 
 function checkPassword(password: string) {
     if (password.length < 8) return false;
     return !(!password.match(/[A-Z]/) && !password.match(/[0-9]/));
+}
 
+function checkPhoneNumber(phone_number: string) {
+    return phone_number.match(/\+?[0-9]{7,15}/);
 }
 
 async function getUserByEmail(email: string) {
