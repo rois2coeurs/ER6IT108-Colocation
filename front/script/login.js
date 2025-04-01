@@ -1,23 +1,9 @@
-const loginForm = document.getElementById('login-form');
-const errorElem = document.getElementById('error');
-
-async function checkToken() {
-    const { api_url } = JSON.parse(localStorage.getItem('config') || '{}');
-    if (localStorage.getItem('token') && api_url) {
-        const res = await fetch(`${api_url}/validate`, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
-        if (!res.ok) {
-            localStorage.removeItem('token');
-        } else {
-            window.location.href = "house_share.html";
-        }
-    }
-}
+import {checkToken, displayError} from "./auth_utils.js";
 
 checkToken();
+
+const loginForm = document.getElementById('login-form');
+const errorElem = document.getElementById('error');
 
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -26,7 +12,7 @@ loginForm.addEventListener('submit', async (e) => {
         email: formData.get('email'),
         password: formData.get('password')
     }
-    const { api_url } = JSON.parse(localStorage.getItem('config') || '{}');
+    const {api_url} = JSON.parse(localStorage.getItem('config') || '{}');
     const res = await fetch(`${api_url}/login`, {
         method: 'POST',
         headers: {
@@ -41,8 +27,7 @@ loginForm.addEventListener('submit', async (e) => {
         localStorage.setItem('token', resData.token);
         window.location.href = "house_share_index.html";
     } else {
-        errorElem.innerText = resData.error;
-        errorElem.style.display = 'block';
+        displayError(errorElem, resData.error);
         alert("Login failed");
     }
 })
