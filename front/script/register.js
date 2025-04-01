@@ -31,9 +31,9 @@ registerForm.addEventListener('submit', async (e) => {
     })
 
     const resData = await res.json();
-    console.log(resData);
     if (res.ok) {
         localStorage.setItem('token', resData.token);
+        localStorage.setItem('user', JSON.stringify(resData.user));
         window.location.href = "house_share_index.html";
     } else {
         displayError(errorElem, resData.error);
