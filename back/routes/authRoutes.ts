@@ -34,7 +34,7 @@ export default {
 }
 
 function getUserGeneralInfo(userId: number) {
-    return sql`SELECT firstname, name, mail, phone_number
+    return sql`SELECT id, firstname, name, mail, phone_number
                FROM users
                WHERE id = ${userId}`;
 }
