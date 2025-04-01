@@ -1,4 +1,4 @@
-import {ApiClient} from "api_client.js";
+import {ApiClient} from "../script/api_client.js";
 
 const api = new ApiClient();
 
