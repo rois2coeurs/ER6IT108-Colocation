@@ -1,13 +1,22 @@
-import { ApiClient } from './api_client.js';
+import {ApiClient} from "../script/api_client.js";
 
-const apiClient = new ApiClient();
+
+const api = new ApiClient();
+const url = new URL(window.location.href);
 const id = url.searchParams.get('id');
-if (!id) window.location.href = 'index.html';
-const houseShareId = await api.get(`/house-share/${id}`)
+if (!id) {
+    await redirectIfHasHouseShare();
+}
+
+
+
+const houseShare = await api.get(`/house-share/${id}`); // template API
 const paymentsList = document.getElementById('payments-list');
 const houseShareName = document.getElementById('house-share-name');
 const togglePayments = document.getElementById('toggle-payments');
 let isExpanded = false;
+
+
 
 try {
     // Set user email
@@ -15,7 +24,7 @@ try {
     document.getElementById('profile-email').textContent = userEmail;
 
     // Get house share name and shared fund info
-    const houseShareResponse = await apiClient.get(`/house-share/${houseShareId}/shared-fund`);
+    const houseShareResponse = await api.get(`/house-share/${houseShare.id}/shared-fund`);
     const houseShareData = await houseShareResponse.json();
     houseShareName.textContent = houseShareData.name;
 
@@ -28,7 +37,7 @@ try {
 
 async function loadPayments() {
     try {
-        const response = await apiClient.get(`/house-share/${houseShareId}/shared-fund/payments`);
+        const response = await api.get(`/house-share/${houseShare.id}/shared-fund/payments`);
         const payments = await response.json();
         
         displayPayments(payments, isExpanded);
@@ -74,6 +83,6 @@ async function redirectIfHasHouseShare() {
     if (res.ok && resData.houseShareId) {
         window.location.href = 'shared_fund.html?id=' + resData.houseShareId;
     }
+    console.log(resData.houseShareId);
 }
 
-redirectIfHasHouseShare();
