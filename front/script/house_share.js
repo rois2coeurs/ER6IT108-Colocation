@@ -8,6 +8,10 @@ const houseShare = await (await api.get(`/house-share/${id}`)).json(); // templa
 let isExpanded = false;
 const toggleMembers = document.getElementById('toggle-members');
 
+let isPurchasesExpanded = false;
+const togglePurchases = document.getElementById('toggle-purchases');
+const purchasesList = document.getElementById('purchases-list');
+
 async function loadData(id) {
     const res = await api.get(`/house-share/${id}`); // template API
 
@@ -17,7 +21,6 @@ async function loadData(id) {
     }
 
     const data = await res.json();
-
 
     const houseShareNameElement = document.getElementById('house-share-name');
     if (houseShareNameElement) {
@@ -29,6 +32,7 @@ async function loadData(id) {
     document.getElementById('profile-email').textContent = userEmail;
 
     loadMembers();
+    loadPurchases();
 }
 
 async function loadMembers() {
@@ -62,9 +66,46 @@ function displayMembers(members, showAll) {
     toggleMembers.textContent = showAll ? 'Voir moins' : 'Afficher tout';
 }
 
+async function loadPurchases() {
+    try {
+        const response = await api.get(`/house-share/${houseShare.id}/purchases`);
+        const purchases = await response.json();
+
+        displayPurchases(purchases, isPurchasesExpanded);
+    } catch (error) {
+        console.error('Error loading purchases:', error);
+    }
+}
+
+function displayPurchases(purchases, showAll) {
+    purchasesList.innerHTML = '';
+    const displayLimit = showAll ? purchases.length : 5;
+
+    const purchasesToShow = purchases.slice(0, displayLimit);
+    if (purchasesToShow.length === 0) {
+        purchasesList.innerHTML = '<p>Aucun achat trouvé.</p>';
+        return;
+    }
+
+    purchasesToShow.forEach(purchase => {
+        const purchaseElement = document.createElement('p');
+        const date = new Date(purchase.date).toLocaleDateString('fr-FR');
+        purchaseElement.innerHTML = `- ${purchase.title} ${purchase.amount}€ ${date} ${purchase.firstname} ${purchase.name}`;
+        purchasesList.appendChild(purchaseElement);
+    });
+
+    // Update toggle button text
+    togglePurchases.textContent = showAll ? 'Voir moins' : 'Afficher tout';
+}
+
 toggleMembers.addEventListener('click', () => {
     isExpanded = !isExpanded;
     loadMembers();
+});
+
+togglePurchases.addEventListener('click', () => {
+    isPurchasesExpanded = !isPurchasesExpanded;
+    loadPurchases();
 });
 
 loadData(id);
