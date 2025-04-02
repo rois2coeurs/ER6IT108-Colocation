@@ -60,4 +60,5 @@ a {
     color: red;
     margin-bottom: 20px;
     font-weight: bold;
+    max-width: 350px;
 }

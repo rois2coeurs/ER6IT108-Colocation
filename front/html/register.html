@@ -2,9 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Register</title>
+    <title>Inscription</title>
+    <link rel="stylesheet" href="../style/login.css">
+    <script src="../script/config_loader.js"></script>
+    <script type="module" src="../script/register.js"></script>
 </head>
 <body>
-    <h1>Work in progress</h1>
+<div class="container">
+    <div class="box">
+        <div class="header">
+            <h2><a href="login.html">Connection</a></h2>
+            <h2 class="selected"><a href="#">Inscription</a></h2>
+        </div>
+        <div id="error" class="error" style="display: none"></div>
+        <div class="login">
+            <form action="" method="post" id="register-form">
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" placeholder="example@gmail.com" required>
+                </div>
+                <div class="input-group">
+                    <label for="name">Nom</label>
+                    <input type="text" name="name" id="name" placeholder="Smith" required>
+                </div>
+                <div class="input-group">
+                    <label for="firstname">Prénom</label>
+                    <input type="text" name="firstname" id="firstname" placeholder="John" required>
+                </div>
+                <div class="input-group">
+                    <label for="phone_number">Téléphone</label>
+                    <input type="tel" name="phone_number" id="phone_number" placeholder="06 12 34 56 78 99" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" name="password" id="password" placeholder="*********" required>
+                </div>
+                <div class="input-group">
+                    <label for="password-double">Confirmation mot de passe</label>
+                    <input type="password" name="password-double" id="password-double" placeholder="*********" required>
+                </div>
+                <button type="submit" class="submit">Inscription</button>
+            </form>
+        </div>
+    </div>
+</div>
 </body>
 </html>

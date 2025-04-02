@@ -6,6 +6,7 @@ async function checkLogin() {
     const res = await api.get("/validate");
     if (!res.ok) {
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
         window.location.href = 'login.html';
     }
 }
