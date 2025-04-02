@@ -15,7 +15,7 @@ const paymentsList = document.getElementById('payments-list');
 const houseShareName = document.getElementById('house-share-name');
 const togglePayments = document.getElementById('toggle-payments');
 let isExpanded = false;
-console.log(houseShare);
+
 
 
 try {
@@ -39,7 +39,6 @@ async function loadPayments() {
     try {
         const response = await api.get(`/house-share/${houseShare.id}/shared-fund/payments`);
         const payments = await response.json();
-        console.log(payments)
         
         displayPayments(payments, isExpanded);
     } catch (error) {
@@ -56,7 +55,6 @@ function displayPayments(payments, showAll) {
         paymentsList.innerHTML = '<p>Aucun paiement trouvé.</p>';
         return;
     }
-    console.log(paymentsToShow)
     
     paymentsToShow.forEach(payment => {
         const date = new Date(payment.date).toLocaleDateString('fr-FR');
@@ -89,6 +87,5 @@ async function redirectIfHasHouseShare() {
     if (res.ok && resData.houseShareId) {
         window.location.href = 'shared_fund.html?id=' + resData.houseShareId;
     }
-    console.log(resData.houseShareId);
 }
 
