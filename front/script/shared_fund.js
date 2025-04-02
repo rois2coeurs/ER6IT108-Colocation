@@ -20,7 +20,7 @@ let isExpanded = false;
 
 try {
     // Set user email
-    const userEmail = localStorage.getItem('email');
+    const userEmail = JSON.parse(localStorage.getItem('user')).mail;
     document.getElementById('profile-email').textContent = userEmail;
 
     // Get house share name and shared fund info
