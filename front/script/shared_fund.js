@@ -10,12 +10,12 @@ if (!id) {
 
 
 
-const houseShare = await api.get(`/house-share/${id}`); // template API
+const houseShare = await (await api.get(`/house-share/${id}`)).json(); // template API
 const paymentsList = document.getElementById('payments-list');
 const houseShareName = document.getElementById('house-share-name');
 const togglePayments = document.getElementById('toggle-payments');
 let isExpanded = false;
-
+console.log(houseShare);
 
 
 try {
@@ -39,6 +39,7 @@ async function loadPayments() {
     try {
         const response = await api.get(`/house-share/${houseShare.id}/shared-fund/payments`);
         const payments = await response.json();
+        console.log(payments)
         
         displayPayments(payments, isExpanded);
     } catch (error) {
@@ -51,6 +52,11 @@ function displayPayments(payments, showAll) {
     const displayLimit = showAll ? payments.length : 5;
     
     const paymentsToShow = payments.slice(0, displayLimit);
+    if (paymentsToShow.length === 0) {
+        paymentsList.innerHTML = '<p>Aucun paiement trouvé.</p>';
+        return;
+    }
+    console.log(paymentsToShow)
     
     paymentsToShow.forEach(payment => {
         const date = new Date(payment.date).toLocaleDateString('fr-FR');

@@ -91,6 +91,22 @@ export default {
 
             return Response.json({message: "Successfully left the house-share"}, {status: 200});
         }
+    },
+    '/house-share/:id/shared-fund' : {
+        GET: async (req: BunRequest<"/house-share/:id/shared-fund">) => {
+            AuthHelper.checkAuth(req);
+            const {id} = req.params;
+            const members = await getHouseShareSharedFund(Number(id));
+            return Response.json(members);
+        }
+    },
+    '/house-share/:id/shared-fund/payments' : {
+        GET: async (req: BunRequest<"/house-share/:id/shared-fund/payments">) => {
+            AuthHelper.checkAuth(req);
+            const {id} = req.params;
+            const members = await getHouseShareSharedFundPayments(Number(id));
+            return Response.json(members);
+        }
     }
 }
 
@@ -154,4 +170,22 @@ async function updateHouseShareMember(userId: number, id: number) {
     await sql`UPDATE stays 
             SET exit_date = CURRENT_DATE
             WHERE house_share_id = ${id} AND user_id = ${userId} AND exit_date IS NULL;`;
+}
+
+
+async function getHouseShareSharedFund(id: number) {
+    return sql`SELECT name
+               FROM house_share
+               WHERE id = ${id};`;
+}
+
+async function getHouseShareSharedFundPayments(id: number) {
+    return sql`
+        SELECT users.name, users.firstname, contributions.date, contributions.amount
+        FROM house_share
+        INNER JOIN shared_fund ON shared_fund.house_share_id = house_share.id
+        INNER JOIN contributions ON contributions.shared_fund_id = shared_fund.id
+        INNER JOIN users ON contributions.user_id = users.id
+        WHERE house_share.id = ${id}
+        ORDER BY contributions.date DESC;`;
 }
