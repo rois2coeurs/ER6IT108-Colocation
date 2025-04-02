@@ -15,6 +15,15 @@ async function loadData(id) {
     const data = await res.json();
 
     console.log(data);
+
+    const houseShareNameElement = document.getElementById('house-share-name');
+    if (houseShareNameElement) {
+        houseShareNameElement.textContent = data.name;
+    }
+
+    // Set user email
+    const userEmail = JSON.parse(localStorage.getItem('user')).mail;
+    document.getElementById('profile-email').textContent = userEmail;
 }
 
 loadData(id);
