@@ -25,7 +25,7 @@ const serve = Bun.serve({
         const url = new URL(req.url);
         if (url.pathname.startsWith('/front/')) {
             const file = Bun.file("../" + url.pathname);
-            if (!file) return new Response('File not found', {status: 404});
+            if (!await file.exists()) return new Response('File not found', {status: 404});
             console.log(url + " ==> " + "../" + url.pathname);
             return new Response(file);
         } else {
