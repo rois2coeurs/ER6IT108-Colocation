@@ -27,7 +27,6 @@ async function submitTransfer(event) {
         return;
     }
 
-    alert('Transfer submitted successfully');
     transferForm.reset();
     await loadHistory();
 }
@@ -37,7 +36,7 @@ async function loadHistory() {
     if (!id) window.location.href = 'index.html';
 
     const res = await api.get(`/transfer/${id}`);
-    if (!res.ok) alert('Error loading transfer history');
+    if (!res.ok) return;
 
     const data = await res.json();
     data.reverse(); // Reverse the order of the data to show the most recent transfers first
