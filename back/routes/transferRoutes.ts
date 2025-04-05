@@ -33,7 +33,7 @@ function getUserTransfers(userId: number) {
                FROM transfers
                INNER JOIN users ON transfers.receiver_id = users.id
                WHERE sender_id = ${userId}
-               UNION 
+               UNION ALL
                SELECT transfers.id, transfers.amount, transfers.date, users.firstname, users.name, False as is_sender
                FROM transfers
                INNER JOIN users ON transfers.sender_id = users.id
