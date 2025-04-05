@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../style/transfer.css">
     <script type="module" src="../script/check_login.js"></script>
+    <script type="module" src="../script/transfer.js"></script>
     <title>Versements</title>
 </head>
 <body>
@@ -51,14 +52,15 @@
                     <h2>Envoyé de l'argent</h2>
                 </div>
                 <div class="card-content">
-                    <form id="create-colocation-form">
+                    <form id="transfer-form">
+                        <div id="transfer-error" class="error-message" style="display: none"></div>
                         <div class="input-group">
-                            <label for="email">Receveur:</label>
-                            <input type="email" name="email" id="email" placeholder="john.smith@gmail.com" required>
+                            <label for="recipientEmail">Receveur:</label>
+                            <input type="email" name="recipientEmail" id="recipientEmail" placeholder="john.smith@gmail.com" required>
                         </div>
                         <div class="input-group">
-                            <label for="value">Montant:</label>
-                            <input type="number" name="value" id="value" placeholder="20€" required>
+                            <label for="amount">Montant:</label>
+                            <input type="number" name="amount" id="amount" placeholder="20€" required>
                         </div>
                         <button type="submit" class="submit">Envoyer de l'argent</button>
                     </form>
@@ -68,12 +70,11 @@
             <div class="card invitation-container">
                 <div class="card-header">
                     <span class="icon">≡</span>
-                    <h2>Rejoindre une colocation existante</h2>
+                    <h2>Historique des versements</h2>
                 </div>
                 <div class="card-content">
-                    <div id="house-shares-list">
-                        <p>Chargement des invitations...</p>
-                    </div>
+                    <table id="transfer-history">
+                    </table>
                 </div>
             </div>
         </div>
