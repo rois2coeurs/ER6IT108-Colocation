@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../style/transfer.css">
+    <script type="module" src="../script/check_login.js"></script>
+    <title>Versements</title>
+</head>
+<body>
+<div class="main-container">
+    <div class="sidebar">
+        <nav>
+            <div class="nav-item">
+                <a href="index.html">Accueil</a>
+            </div>
+            <div class="nav-item">
+                <a href="house_share_index.html">Colocation</a>
+            </div>
+            <div class="nav-item">
+                <a href="shared_fund.html">Cagnotte</a>
+            </div>
+            <div class="nav-item active">
+                <a href="transfer.html">Versement</a>
+            </div>
+            <div class="nav-item">
+                <a href="purchase.html">Payement</a>
+            </div>
+        </nav>
+    </div>
+
+    <div class="content-area">
+        <div class="header">
+            <div class="title">
+                <h1>Versements</h1>
+            </div>
+            <div class="profile">
+                <span class="profile-email" id="user-email">[email]</span>
+                <div class="profile-icon">
+                    <a href="user-info.html">
+                        <img src="../assets/profile-icon.svg" alt="Profile">
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="utility-container">
+            <div class="card creation-container">
+                <div class="card-header">
+                    <img src="../assets/send-money.svg" alt="Send money icon" class="icon"/>
+                    <h2>Envoyé de l'argent</h2>
+                </div>
+                <div class="card-content">
+                    <form id="create-colocation-form">
+                        <div class="input-group">
+                            <label for="email">Receveur:</label>
+                            <input type="email" name="email" id="email" placeholder="john.smith@gmail.com" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="value">Montant:</label>
+                            <input type="number" name="value" id="value" placeholder="20€" required>
+                        </div>
+                        <button type="submit" class="submit">Envoyer de l'argent</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card invitation-container">
+                <div class="card-header">
+                    <span class="icon">≡</span>
+                    <h2>Rejoindre une colocation existante</h2>
+                </div>
+                <div class="card-content">
+                    <div id="house-shares-list">
+                        <p>Chargement des invitations...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
