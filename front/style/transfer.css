@@ -39,7 +39,7 @@ a {
     transition: background-color 0.3s;
 }
 
-.nav-item:hover, .nav-item.active {
+.nav-item:hover a, .nav-item.active a {
     border-bottom: 2px solid var(--secondary-color);
 }
 

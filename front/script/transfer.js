@@ -54,7 +54,7 @@ async function loadHistory() {
 
 function createRow(data) {
     const row = document.createElement('tr');
-    row.innerHTML = `
+    row.innerHTML = ` 
         <td>${data.firstname[0]}. ${data.name}</td>
         <td class="end"><span class="bubble">${data.is_sender === true ? "Envoyé" : "Reçu"}</span></td>
         <td class="end">${data.amount}€</td>
