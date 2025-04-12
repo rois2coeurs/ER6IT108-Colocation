@@ -27,7 +27,7 @@ export default {
             const {id} = req.params;
             const house = await getHouseShare(Number(id));
             if (!house[0]) throw new SafeDisplayError("house-share not found!", 404);
-            return Response.json(house[0]);
+            return Response.json(house[0], {headers: {'Cache-Control': 'max-age=300'}});
         },
         DELETE: async (req: BunRequest<"/house-share/:id">) => {
             const userId = AuthHelper.checkAuth(req);
