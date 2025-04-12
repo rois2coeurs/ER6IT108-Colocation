@@ -6,7 +6,7 @@ export default {
         GET: async (req: BunRequest<"/me/house-share">) => {
             const userId = AuthHelper.checkAuth(req);
             const houseShareId = await getUserHouseShare(userId);
-            return Response.json({houseShareId});
+            return Response.json({houseShareId}, {headers: {"Cache-Control": "max-age=60"}});
         }
     }
 }
