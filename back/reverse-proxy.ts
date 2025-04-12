@@ -23,6 +23,11 @@ const serve = Bun.serve({
     port: 8090,
     async fetch(req) {
         const url = new URL(req.url);
+        if (req.method === "OPTIONS") {
+            const res = new Response(null);
+            setCorsHeaders(res);
+            return res;
+        }
         if (url.pathname.startsWith('/front/')) {
             const file = Bun.file("../" + url.pathname);
             if (!await file.exists()) return new Response('File not found', {status: 404});
@@ -30,10 +35,19 @@ const serve = Bun.serve({
             return new Response(file);
         } else {
             console.log(url + " ==> http://localhost:3000" + url.pathname);
-            return fetch(`http://localhost:3000${url.pathname}`, req);
+            const res = await fetch(`http://localhost:3000${url.pathname}`, req);
+            const response = new Response (res.body, { status: res.status, statusText: res.statusText });
+            setCorsHeaders(response);
+            return response;
         }
     }
 });
+
+function setCorsHeaders(res: Response) {
+    res.headers.set("Access-Control-Allow-Origin", "*");
+    res.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+}
 
 console.warn("/!\\ This is a development reverse proxy, do not use it in production. /!\\");
 console.log(`Reverse proxy running on ${serve.url}`);
