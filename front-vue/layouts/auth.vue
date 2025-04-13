@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const errors = ref<string[]>([]);
 </script>
 
 <template>
