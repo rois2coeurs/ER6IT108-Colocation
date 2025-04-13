@@ -2,8 +2,12 @@
 const {$apiClient} = useNuxtApp();
 const errors = ref<string[]>([]);
 const transfers = ref<Transfer[]>([]);
+const displayAll = ref(false);
 const formRef = ref<HTMLFormElement | null>(null);
 const hasTransfers = computed(() => transfers.value.length > 0);
+const historyButtonTitle = computed(() => {
+  return displayAll.value ? 'Afficher moins' : 'Afficher plus';
+});
 
 async function handleApiResponse(response: Response, defaultError: string) {
   const data = await response.json();
@@ -33,22 +37,19 @@ async function postSendMoney() {
   }
 }
 
-async function loadAllTransfers() {
+async function loadTransfers() {
   try {
-    const res = await fetchTransfers(getUserId(), 100);
-    transfers.value = await handleApiResponse(res, 'Failed to load all transfers.');
+    const limit = displayAll.value ? 100 : 5;
+    const res = await fetchTransfers(getUserId(), limit);
+    transfers.value = await handleApiResponse(res, 'Failed to load transfers.');
   } catch (error) {
     console.error(error);
   }
 }
 
-async function loadTransfers() {
-  try {
-    const res = await fetchTransfers(getUserId(), 5);
-    transfers.value = await handleApiResponse(res, 'Failed to load transfers.');
-  } catch (error) {
-    console.error(error);
-  }
+async function changeDisplayMode() {
+  displayAll.value = !displayAll.value;
+  await loadTransfers();
 }
 
 await loadTransfers();
@@ -70,7 +71,8 @@ await loadTransfers();
         </form>
       </template>
     </Card>
-    <Card title="Historique des versements" icon="mdi:history" :on-button-click="loadAllTransfers">
+    <Card title="Historique des versements" icon="mdi:history" :on-button-click="changeDisplayMode"
+          :button-text="historyButtonTitle">
       <template #default>
         <table v-if="hasTransfers" id="transfer-history">
           <tr v-for="(transfer, index) in transfers" :key="index">
