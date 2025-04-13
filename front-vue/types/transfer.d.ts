@@ -3,4 +3,5 @@ declare interface Transfer {
     name: string;
     is_sender: boolean;
     amount: number;
+    date: string;
 }
