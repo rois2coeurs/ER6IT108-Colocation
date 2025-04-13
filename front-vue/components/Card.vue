@@ -26,7 +26,7 @@ defineProps({
         <p>This is empty :(</p>
       </slot>
     </div>
-    <Button v-if="displayButton" :onButtonClick="onButtonClick" />
+    <Button v-if="displayButton" :onButtonClick="onButtonClick" :button-text="buttonText" />
   </div>
 </template>
 
