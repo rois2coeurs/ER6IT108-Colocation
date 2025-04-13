@@ -15,8 +15,8 @@ async function handleApiResponse(response: Response, defaultError: string) {
   return data;
 }
 
-async function fetchTransfers(userId: number) {
-  return await $apiClient.get(`/transfer/${userId}`);
+async function fetchTransfers(userId: number, limit: number) {
+  return await $apiClient.get(`/transfer/${userId}?limit=${limit}`);
 }
 
 async function postTransfer(userId: number, data: any) {
@@ -32,10 +32,17 @@ async function postSendMoney() {
     console.error(error);
   }
 }
-
+async function loadAllTransfers() {
+  try {
+    const res = await fetchTransfers(getUserId(), 100);
+    transfers.value = await handleApiResponse(res, 'Failed to load all transfers.');
+  } catch (error) {
+    console.error(error);
+  }
+}
 async function loadTransfers() {
   try {
-    const res = await fetchTransfers(getUserId());
+    const res = await fetchTransfers(getUserId(), 5);
     transfers.value = await handleApiResponse(res, 'Failed to load transfers.');
   } catch (error) {
     console.error(error);
@@ -61,7 +68,7 @@ await loadTransfers();
         </form>
       </template>
     </Card>
-    <Card title="Historique des versements" icon="mdi:history">
+    <Card title="Historique des versements" icon="mdi:history" :on-button-click="loadAllTransfers">
       <template #default>
         <table v-if="hasTransfers" id="transfer-history">
           <tr v-for="(transfer, index) in transfers" :key="index">
