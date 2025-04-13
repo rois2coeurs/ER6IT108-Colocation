@@ -18,8 +18,8 @@ async function getHouseShareId() {
         <NuxtLink to="/"><Icon name="mdi:home-variant" /> Acceuil</NuxtLink>
       </div>
       <div class="nav-item">
-        <NuxtLink v-if="!houseShareId" to="/house_share">Coloc</NuxtLink>
-        <NuxtLink v-else :to="'/house_share/' + houseShareId">Coloc</NuxtLink>
+        <NuxtLink v-if="!houseShareId" to="/house_share">Colocation</NuxtLink>
+        <NuxtLink v-else :to="'/house_share/' + houseShareId">Colocation</NuxtLink>
       </div>
       <div class="nav-item">
         <NuxtLink to="/shared_fund">Cagnotte</NuxtLink>

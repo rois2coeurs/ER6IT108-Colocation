@@ -1,3 +1,28 @@
+<script setup lang="ts">
+const {$apiClient} = useNuxtApp();
+const route = useRoute()
+
+const title = ref("Vous faites partie de [Nom Colocation]");
+const houseShare = ref<HouseShare | null>(null)
+const members = ref<Member[]>([]);
+const loadHouseShare = async () => {
+  const res = await $apiClient.get(`/house-share/${route.params.id}`);
+  const data = await res.json();
+  if (!res.ok && data.error) {
+    alert(data.error);
+    window.location.href = '/';
+  }
+  houseShare.value = data;
+  title.value = "Vous faites partie de \"" + data.name + "\"";
+};
+const loadMembers = async () => {
+  const res = await $apiClient.get(`/house-share/${route.params.id}/members`);
+  members.value = await res.json();
+};
+await loadHouseShare();
+await loadMembers();
+</script>
+
 <template>
   <NuxtLayout :title="title">
     <Card
@@ -9,7 +34,10 @@
       <template #default>
         <div v-for="(member, index) in members" :key="index" class="member-item">
           <div class="member-info">
-            <p>{{ member.firstname }}</p>
+            <p>
+              <Icon v-if="member.id === houseShare?.manager_id" name="mdi:crown" style="color: orange;"/>
+              {{ member.firstname }}
+            </p>
             <p>{{ member.name }}</p>
             <p>{{ new Date(member.entry_date).toLocaleDateString() }}</p>
           </div>
@@ -23,25 +51,6 @@
     </Card>
   </NuxtLayout>
 </template>
-
-<script setup lang="ts">
-const {$apiClient} = useNuxtApp();
-const route = useRoute()
-
-const title = ref("Vous faites partie de [Nom Colocation]");
-const members = ref([]);
-const loadTitle = async () => {
-  const res = await $apiClient.get(`/house-share/${route.params.id}`);
-  const data = await res.json();
-  title.value = "Vous faites partie de \"" + data.name + "\"";
-};
-const loadMembers = async () => {
-  const res = await $apiClient.get(`/house-share/${route.params.id}/members`);
-  members.value = await res.json();
-};
-await loadTitle();
-await loadMembers();
-</script>
 
 <style scoped>
 .member-info {
