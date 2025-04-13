@@ -32,6 +32,7 @@ async function postSendMoney() {
     console.error(error);
   }
 }
+
 async function loadAllTransfers() {
   try {
     const res = await fetchTransfers(getUserId(), 100);
@@ -40,6 +41,7 @@ async function loadAllTransfers() {
     console.error(error);
   }
 }
+
 async function loadTransfers() {
   try {
     const res = await fetchTransfers(getUserId(), 5);
@@ -73,6 +75,7 @@ await loadTransfers();
         <table v-if="hasTransfers" id="transfer-history">
           <tr v-for="(transfer, index) in transfers" :key="index">
             <td>{{ transfer.firstname[0] + '.' + transfer.name }}</td>
+            <td>{{ new Date(transfer.date).toLocaleDateString() }}</td>
             <td class="center"><span class="bubble">{{ transfer.is_sender === true ? "Envoyé" : "Reçu" }}</span></td>
             <td class="end">{{ transfer.amount }}€</td>
           </tr>
