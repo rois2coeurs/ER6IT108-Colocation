@@ -34,9 +34,13 @@ const serve = Bun.serve({
             console.log(url + " ==> " + "../" + url.pathname);
             return new Response(file);
         } else {
-            console.log(url + " ==> http://localhost:3000" + url.pathname);
-            const res = await fetch(`http://localhost:3000${url.pathname}`, req);
-            const response = new Response (res.body, { status: res.status, statusText: res.statusText });
+            const redirectUrl = new URL(req.url);
+            redirectUrl.hostname = "localhost";
+            redirectUrl.port = "3000";
+            redirectUrl.protocol = "http";
+            console.log(url + " ==> " + redirectUrl);
+            const res = await fetch(redirectUrl, req);
+            const response = new Response(res.body, {status: res.status, statusText: res.statusText});
             setCorsHeaders(response);
             return response;
         }
