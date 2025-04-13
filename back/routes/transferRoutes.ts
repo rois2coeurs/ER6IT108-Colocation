@@ -8,8 +8,9 @@ export default {
         GET: async (req: BunRequest<"/transfer/:userId">) => {
             const currentUserId = AuthHelper.checkAuth(req);
             const {userId} = req.params;
+            const searchParams = new URLSearchParams(new URL(req.url).search);
             if (currentUserId !== Number(userId)) throw new UnauthorizedError("You are not authorized to view this user's transfers");
-            const transfers = await getUserTransfers(Number(userId));
+            const transfers = await getUserTransfers(Number(userId), Number(searchParams.get("limit") || 10), Number(searchParams.get("offset") || 0));
             return Response.json(transfers);
         },
         POST: async (req: BunRequest<"/transfer/:userId">) => {
@@ -28,16 +29,19 @@ export default {
     }
 }
 
-function getUserTransfers(userId: number) {
+function getUserTransfers(userId: number, limit: number, offset: number) {
     return sql`SELECT transfers.id, transfers.amount, transfers.date, users.firstname, users.name, True as is_sender
                FROM transfers
-               INNER JOIN users ON transfers.receiver_id = users.id
+                        INNER JOIN users ON transfers.receiver_id = users.id
                WHERE sender_id = ${userId}
                UNION ALL
                SELECT transfers.id, transfers.amount, transfers.date, users.firstname, users.name, False as is_sender
                FROM transfers
-               INNER JOIN users ON transfers.sender_id = users.id
-               WHERE receiver_id = ${userId}`;
+                        INNER JOIN users ON transfers.sender_id = users.id
+               WHERE receiver_id = ${userId}
+               ORDER BY date DESC
+                   LIMIT ${limit}
+               OFFSET ${offset}`;
 }
 
 function getUserByEmail(email: string) {
