@@ -63,7 +63,8 @@ export default {
             const userId = AuthHelper.checkAuth(req);
             const {id} = req.params;
             if (!await isMember(userId, Number(id))) throw new SafeDisplayError("You are not a member of this house-share", 400);
-            const members = await getHouseShareMembers(Number(id));
+            const searchParams = new URLSearchParams(new URL(req.url).search);
+            const members = await getHouseShareMembers(Number(id), searchParams.get("active") === "true");
             return Response.json(members);
         },
         POST: async (req: BunRequest<"/house-share/:id/members">) => {
@@ -95,6 +96,21 @@ export default {
             return Response.json({message: "Successfully left the house-share"}, {status: 200});
         }
     },
+    '/house-share/:id/members/:memberId': {
+        PUT: async (req: BunRequest<"/house-share/:id/members/:memberId">) => {
+            const userId = AuthHelper.checkAuth(req);
+            const {id, memberId} = req.params;
+            const house = await getHouseShare(Number(id));
+            if (!house[0]) throw new SafeDisplayError("house-share not found!", 404);
+            if (house[0].manager_id !== userId) throw new UnauthorizedError("Only the manager can kick members");
+
+            const membership = await checkMembership(Number(memberId), Number(id));
+            if (!membership[0]) throw new SafeDisplayError("This user is not a member of this house-share", 400);
+            await updateHouseShareMember(Number(memberId), Number(id));
+
+            return Response.json({message: "Successfully kicked the user from the house-share"}, {status: 200});
+        }
+    },
     '/house-share/:id/purchases': {
     GET: async (req: BunRequest<"/house-share/:id/purchases">) => {
         AuthHelper.checkAuth(req);
@@ -103,6 +119,7 @@ export default {
         return Response.json(purchases);
         }
     }
+
 }
 
 async function getAllHouseShares() {
@@ -147,7 +164,8 @@ async function updateHouseShare(name: string, address: string, id: number) {
     ${id};`;
 }
 
-async function getHouseShareMembers(id: number) {
+async function getHouseShareMembers(id: number, active: boolean) {
+    const condition = active ? sql`AND exit_date IS NULL` : sql`AND exit_date IS NOT NULL`;
     return sql`SELECT users.id,
                       users.name,
                       users.firstname,
@@ -157,7 +175,7 @@ async function getHouseShareMembers(id: number) {
                       stays.exit_date
                FROM stays
                         INNER JOIN users ON stays.user_id = users.id
-               WHERE stays.house_share_id = ${id};`;
+               WHERE stays.house_share_id = ${id} ${condition}`;
 }
 
 async function getUserByEmail(email: string) {

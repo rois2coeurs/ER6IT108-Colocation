@@ -4,13 +4,35 @@ BEGIN
     IF EXISTS(SELECT id
               FROM stays
               WHERE NEW.user_id = user_id
-                AND ((NEW.exit_date IS NULL AND exit_date IS NOT NULL)
-                  OR (NEW.exit_date IS NOT NULL AND NEW.exit_date BETWEEN entry_date AND COALESCE(exit_date, now()))
-                  OR (NEW.entry_date BETWEEN entry_date AND COALESCE(exit_date, now()))
-                  OR (NEW.entry_date > entry_date AND exit_date IS NULL)))
-    THEN
-        RAISE EXCEPTION 'A stay already exists for this period or user is already staying somewhere else';
+                AND NEW.id != id
+                AND NEW.exit_date IS NULL AND exit_date IS NULL) THEN
+        RAISE EXCEPTION 'A stay already exists with overlapping dates where both exit dates are NULL';
     END IF;
+
+    IF EXISTS(SELECT id
+              FROM stays
+              WHERE NEW.user_id = user_id
+                AND NEW.id != id
+                AND NEW.exit_date IS NOT NULL AND NEW.exit_date BETWEEN entry_date AND COALESCE(exit_date, now())) THEN
+        RAISE EXCEPTION 'A stay already exists with overlapping dates for the provided exit date';
+    END IF;
+
+    IF EXISTS(SELECT id
+              FROM stays
+              WHERE NEW.user_id = user_id
+                AND NEW.id != id
+                AND NEW.entry_date BETWEEN entry_date AND COALESCE(exit_date, now())) THEN
+        RAISE EXCEPTION 'A stay already exists with overlapping dates for the provided entry date';
+    END IF;
+
+    IF EXISTS(SELECT id
+              FROM stays
+              WHERE NEW.user_id = user_id
+                AND NEW.id != id
+                AND NEW.entry_date > entry_date AND exit_date IS NULL) THEN
+        RAISE EXCEPTION 'A stay already exists with an open-ended exit date and a later entry date';
+    END IF;
+
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
