@@ -1,48 +1,49 @@
 <script setup lang="ts">
-import {checkPassword, displayError} from "../../front/script/auth_utils";
-
 const errors = ref<string[]>([]);
-onMounted(() => {
-  const registerForm = document.getElementById('register-form') as HTMLFormElement;
-  registerForm.addEventListener('submit', async (e) => {
+const registerForm = ref<HTMLFormElement | null>(null);
+
+async function postRegister(data: any) {
+  const {api_url} = JSON.parse(localStorage.getItem('config') || '{}');
+  return await fetch(`${api_url}/register`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+}
+
+async function handleApiResponse(response: Response, defaultError: string): Promise<any> {
+  const data = await response.json();
+  if (!response.ok) {
+    errors.value = [data.error || defaultError];
+    throw new Error(data.error || defaultError);
+  }
+  return data;
+}
+
+async function handleSubmit(e: Event) {
+  try {
     e.preventDefault();
-    const formData = new FormData(registerForm);
-    const data = Object.fromEntries(formData.entries());
+    const data = getFormData(registerForm);
     const checkPasswordErrors = checkPassword(data['password'], data['password-double']);
     if (checkPasswordErrors.length > 0) {
       errors.value = checkPasswordErrors;
       return;
     }
-    const {api_url} = JSON.parse(localStorage.getItem('config') || '{}');
-    const res = await fetch(`${api_url}/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-
-    const resData = await res.json();
-    if (res.ok) {
-      localStorage.setItem('token', resData.token);
-      localStorage.setItem('user', JSON.stringify(resData.user));
-      window.location.href = "/";
-    } else {
-      if (resData.error) {
-        errors.value = [resData.error];
-      } else {
-        errors.value = ['Une erreur est survenue.'];
-      }
-    }
-  })
-});
+    const res = await postRegister(data);
+    const resData = await handleApiResponse(res, 'Failed to register.');
+    localStorage.setItem('token', resData.token);
+    localStorage.setItem('user', JSON.stringify(resData.user));
+    window.location.href = "/";
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 function checkPassword(password: string | null, passwordDouble: string | null) {
-  const errors = [];
-  if (!password || !passwordDouble) {
-    errors.push('Password is required');
-    return errors;
-  }
+  const errors: string[] = [];
+  if (!password || !passwordDouble) return ['Password is required'];
   if (password !== passwordDouble) errors.push('Passwords do not match');
   if (password.length < 8) errors.push('Password must be at least 8 characters');
   if (!password.match(/[A-Z]/) && !password.match(/[0-9]/)) errors.push('Password must contain at least one uppercase letter or one number');
@@ -52,7 +53,7 @@ function checkPassword(password: string | null, passwordDouble: string | null) {
 
 <template>
   <NuxtLayout name="auth">
-    <form action="" method="post" id="register-form">
+    <form ref="registerForm" @submit="handleSubmit">
       <FormErrorBox :errors="errors"/>
       <div class="input-group">
         <label for="email">Email</label>
