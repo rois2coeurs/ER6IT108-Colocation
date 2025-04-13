@@ -6,6 +6,10 @@ defineProps({
     type: String,
     default: 'Afficher Tout'
   },
+  displayButton: {
+    type: Boolean,
+    default: true
+  },
   onButtonClick: Function
 });
 </script>
@@ -22,7 +26,7 @@ defineProps({
         <p>This is empty :(</p>
       </slot>
     </div>
-    <button class="toggle" v-on:click="onButtonClick">{{ buttonText }}</button>
+    <Button v-if="displayButton" :onButtonClick="onButtonClick" />
   </div>
 </template>
 
@@ -61,21 +65,5 @@ defineProps({
   margin-bottom: 20px;
   margin-left: 10px;
   margin-right: 10px;
-}
-
-.toggle {
-  background-color: #EB5160FF;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 15px;
-  font-size: 16px;
-  cursor: pointer;
-  width: 100%;
-  transition: background-color 0.3s;
-}
-
-.toggle:hover {
-  background-color: #d83848;
 }
 </style>

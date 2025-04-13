@@ -18,7 +18,7 @@ onMounted(() => {
     <div class="profile">
       <span id="profile-email" class="profile-email">{{email}}</span>
       <div class="profile-icon">
-        <a href="user-info.html">
+        <a href="/user">
           <Icon name="mdi:account-circle-outline" class="profile-icon"/>
         </a>
       </div>
