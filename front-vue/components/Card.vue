@@ -10,7 +10,8 @@ defineProps({
     type: Boolean,
     default: true
   },
-  onButtonClick: Function
+  onButtonClick: Function,
+  buttonIcon: String,
 });
 </script>
 
@@ -26,7 +27,7 @@ defineProps({
         <p>This is empty :(</p>
       </slot>
     </div>
-    <Button v-if="displayButton" :onButtonClick="onButtonClick" :button-text="buttonText" />
+    <Button v-if="displayButton" :onButtonClick="onButtonClick" :button-text="buttonText" :icon="buttonIcon"/>
   </div>
 </template>
 
@@ -36,7 +37,8 @@ defineProps({
   border-radius: 15px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
   padding: 25px;
-  min-width: 500px;
+  min-width: 550px;
+  max-width: 800px;
   flex: 1;
   height: fit-content;
 }
