@@ -4,12 +4,16 @@ defineProps({
     type: String,
     default: 'Afficher Tout'
   },
-  onButtonClick: Function
+  onButtonClick: Function,
+  icon: String
 });
 </script>
 
 <template>
-  <button class="toggle" v-on:click="onButtonClick">{{ buttonText }}</button>
+  <button class="toggle" v-on:click="onButtonClick">
+    <Icon v-if="icon" :name="icon"/>
+    {{ buttonText }}
+  </button>
 </template>
 
 <style scoped>
@@ -23,6 +27,7 @@ defineProps({
   cursor: pointer;
   width: 100%;
   transition: background-color 0.3s;
+  font-weight: bold;
 }
 
 .toggle:hover {
