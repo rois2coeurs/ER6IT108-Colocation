@@ -13,12 +13,13 @@ defineProps({
     default: 'text'
   }
 })
+const value = defineModel('value');
 </script>
 
 <template>
   <div class="form-input-group">
     <label :for="name">{{ label }}</label>
-    <input :type="inputType" :name="name" type="{{inputType}}" />
+    <input :type="inputType" :name="name" type="{{inputType}}" v-model="value" />
   </div>
 </template>
 
