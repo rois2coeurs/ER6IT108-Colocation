@@ -70,6 +70,11 @@ onMounted(() => {
   align-items: center;
 }
 
+.profile-icon:hover {
+  cursor: pointer;
+  border: 1px solid #000000;
+}
+
 .profile-icon img {
   width: 100%;
   height: 100%;
