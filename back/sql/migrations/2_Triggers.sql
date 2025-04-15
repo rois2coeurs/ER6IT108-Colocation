@@ -13,7 +13,8 @@ BEGIN
               FROM stays
               WHERE NEW.user_id = user_id
                 AND NEW.id != id
-                AND NEW.exit_date IS NOT NULL AND NEW.exit_date BETWEEN entry_date AND COALESCE(exit_date, now())) THEN
+                AND NEW.exit_date IS NOT NULL AND NEW.exit_date > entry_date AND NEW.exit_date < COALESCE(exit_date, now())) THEN
+--                 AND NEW.exit_date IS NOT NULL AND NEW.exit_date BETWEEN entry_date AND COALESCE(exit_date, now())) THEN
         RAISE EXCEPTION 'A stay already exists with overlapping dates for the provided exit date';
     END IF;
 
@@ -21,7 +22,8 @@ BEGIN
               FROM stays
               WHERE NEW.user_id = user_id
                 AND NEW.id != id
-                AND NEW.entry_date BETWEEN entry_date AND COALESCE(exit_date, now())) THEN
+                AND NEW.entry_date > entry_date AND NEW.entry_date < COALESCE(exit_date, now())) THEN
+--                 AND NEW.entry_date BETWEEN entry_date AND COALESCE(exit_date, now())) THEN
         RAISE EXCEPTION 'A stay already exists with overlapping dates for the provided entry date';
     END IF;
 
@@ -44,7 +46,7 @@ CREATE TRIGGER stay_dates_check
 EXECUTE FUNCTION stay_dates_check();
 
 ALTER TABLE stays
-    ADD CHECK ( entry_date < exit_date OR exit_date IS NULL );
+    ADD CHECK ( entry_date <= exit_date OR exit_date IS NULL );
 
 -- A house share can have no manager if it's an ended house share
 ALTER TABLE house_share
