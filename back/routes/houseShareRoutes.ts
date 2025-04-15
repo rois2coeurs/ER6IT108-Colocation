@@ -111,6 +111,21 @@ export default {
             return Response.json({message: "Successfully kicked the user from the house-share"}, {status: 200});
         }
     },
+    '/house-share/:id/members/:memberId/transfer': {
+        PUT: async (req: BunRequest<"/house-share/:id/members/:memberId/transfer">) => {
+            const userId = AuthHelper.checkAuth(req);
+            const {id, memberId} = req.params;
+            const house = await getHouseShare(Number(id));
+            if (!house[0]) throw new SafeDisplayError("house-share not found!", 404);
+            if (house[0].manager_id !== userId) throw new UnauthorizedError("Only the manager can transfer ownership");
+
+            const membership = await checkMembership(Number(memberId), Number(id));
+            if (!membership[0]) throw new SafeDisplayError("This user is not a member of this house-share", 400);
+            await updateHouseShareManager(Number(id), Number(memberId));
+
+            return Response.json({message: "Successfully transferred ownership"}, {status: 200});
+        }
+    },
     '/house-share/:id/purchases': {
     GET: async (req: BunRequest<"/house-share/:id/purchases">) => {
         AuthHelper.checkAuth(req);
@@ -158,6 +173,16 @@ async function updateHouseShare(name: string, address: string, id: number) {
     address
     =
     ${address}
+    WHERE
+    id
+    =
+    ${id};`;
+}
+
+async function updateHouseShareManager(id: number, userId: number) {
+    await sql`UPDATE house_share
+              SET manager_id =
+    ${userId}
     WHERE
     id
     =
