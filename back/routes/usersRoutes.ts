@@ -6,7 +6,7 @@ export default {
         GET: async (req: BunRequest<"/me/house-share">) => {
             const userId = AuthHelper.checkAuth(req);
             const houseShareId = await getUserHouseShare(userId);
-            return Response.json({houseShareId}, {headers: {"Cache-Control": "max-age=60"}});
+            return Response.json({houseShareId});
         }
     }
 }
@@ -15,6 +15,7 @@ export default {
 async function getUserHouseShare(userId: number) {
     const house = await sql`SELECT house_share_id
                             FROM stays
-                            WHERE user_id = ${userId}`;
+                            WHERE user_id = ${userId}
+                            AND exit_date IS NULL`;
     return house[0]?.house_share_id;
 }
