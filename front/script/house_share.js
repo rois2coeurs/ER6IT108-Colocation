@@ -1,19 +1,19 @@
-import {ApiClient} from "../script/api_client.js"; // template API
+import {ApiClient} from "../script/api_client.js";
 const url = new URL(window.location.href);
 const id = url.searchParams.get('id');
 if (!id) window.location.href = 'index.html';
-const api = new ApiClient(); // template API
+const api = new ApiClient();
 const membersList = document.getElementById('members-list');
-const houseShare = await (await api.get(`/house-share/${id}`)).json(); // template API
+const purchasesList = document.getElementById('purchases-list');
+
 let isExpanded = false;
 const toggleMembers = document.getElementById('toggle-members');
 
 let isPurchasesExpanded = false;
 const togglePurchases = document.getElementById('toggle-purchases');
-const purchasesList = document.getElementById('purchases-list');
 
 async function loadData(id) {
-    const res = await api.get(`/house-share/${id}`); // template API
+    const res = await api.get(`/house-share/${id}`);
 
     if (!res.ok) {
         window.location.href = 'house_share_index.html';
@@ -27,22 +27,22 @@ async function loadData(id) {
         houseShareNameElement.textContent = data.name;
     }
 
-    // Set user email
     const userEmail = JSON.parse(localStorage.getItem('user')).mail;
     document.getElementById('profile-email').textContent = userEmail;
 
-    loadMembers();
-    loadPurchases();
+    await loadMembers();
+    await loadPurchases();
 }
 
 async function loadMembers() {
     try {
-        const response = await api.get(`/house-share/${houseShare.id}/members`);
+        const response = await api.get(`/house-share/${id}/members`);
         const members = await response.json();
 
         displayMembers(members, isExpanded);
     } catch (error) {
         console.error('Error loading members:', error);
+        membersList.innerHTML = '<p>Erreur lors du chargement des membres.</p>';
     }
 }
 
@@ -56,24 +56,26 @@ function displayMembers(members, showAll) {
         return;
     }
 
-    membersToShow.forEach(members => {
-        const membersElement = document.createElement('p');
-        membersElement.innerHTML = `- ${members.firstname} ${members.name} ${members.mail} ${members.phone_number}`;
-        membersList.appendChild(membersElement);
+    membersToShow.forEach(member => {
+        const memberElement = document.createElement('p');
+        memberElement.innerHTML = `- ${member.firstname} ${member.name} ${member.mail} ${member.phone_number}`;
+        membersList.appendChild(memberElement);
     });
 
-    // Update toggle button text
     toggleMembers.textContent = showAll ? 'Voir moins' : 'Afficher tout';
 }
 
 async function loadPurchases() {
     try {
-        const response = await api.get(`/house-share/${houseShare.id}/purchases`);
+        const response = await api.get(`/house-share/${id}/purchases`);
+        if (!response.ok) {
+            throw new Error('Failed to load purchases');
+        }
         const purchases = await response.json();
-
         displayPurchases(purchases, isPurchasesExpanded);
     } catch (error) {
         console.error('Error loading purchases:', error);
+        purchasesList.innerHTML = '<p>Erreur lors du chargement des achats.</p>';
     }
 }
 
@@ -94,7 +96,6 @@ function displayPurchases(purchases, showAll) {
         purchasesList.appendChild(purchaseElement);
     });
 
-    // Update toggle button text
     togglePurchases.textContent = showAll ? 'Voir moins' : 'Afficher tout';
 }
 
