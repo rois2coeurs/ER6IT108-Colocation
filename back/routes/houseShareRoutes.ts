@@ -91,6 +91,14 @@ export default {
 
             return Response.json({message: "Successfully left the house-share"}, {status: 200});
         }
+    },
+    '/house-share/:id/purchases': {
+    GET: async (req: BunRequest<"/house-share/:id/purchases">) => {
+        AuthHelper.checkAuth(req);
+        const {id} = req.params;
+        const purchases = await getHouseSharePurchases(Number(id));
+        return Response.json(purchases);
+        }
     }
 }
 
@@ -154,4 +162,14 @@ async function updateHouseShareMember(userId: number, id: number) {
     await sql`UPDATE stays 
             SET exit_date = CURRENT_DATE
             WHERE house_share_id = ${id} AND user_id = ${userId} AND exit_date IS NULL;`;
+}
+
+async function getHouseSharePurchases(id: number) {
+    return sql`SELECT purchases.id, purchases.title, purchases.amount, purchases.date, 
+                      users.firstname, users.name
+               FROM purchases
+               INNER JOIN users ON purchases.user_id = users.id
+               INNER JOIN shared_fund ON purchases.shared_fund_id = shared_fund.id
+               WHERE shared_fund.house_share_id = ${id}
+               ORDER BY purchases.date DESC;`;
 }
