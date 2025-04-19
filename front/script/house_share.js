@@ -42,7 +42,7 @@ async function loadMembers() {
         displayMembers(members, isExpanded);
     } catch (error) {
         console.error('Error loading members:', error);
-        membersList.innerHTML = '<p>Erreur lors du chargement des membres.</p>';
+        membersList.innerHTML = '<tr><td colspan="4">Erreur lors du chargement des membres.</td></tr>';
     }
 }
 
@@ -52,14 +52,19 @@ function displayMembers(members, showAll) {
 
     const membersToShow = members.slice(0, displayLimit);
     if (membersToShow.length === 0) {
-        membersList.innerHTML = '<p>Aucun membre trouvé.</p>';
+        membersList.innerHTML = '<tr><td colspan="4">Aucun membre trouvé.</td></tr>';
         return;
     }
 
     membersToShow.forEach(member => {
-        const memberElement = document.createElement('p');
-        memberElement.innerHTML = `- ${member.firstname} ${member.name} ${member.mail} ${member.phone_number}`;
-        membersList.appendChild(memberElement);
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${member.firstname}</td>
+            <td>${member.name}</td>
+            <td>${member.mail}</td>
+            <td>${member.phone_number}</td>
+        `;
+        membersList.appendChild(row);
     });
 
     toggleMembers.textContent = showAll ? 'Voir moins' : 'Afficher tout';
@@ -75,7 +80,7 @@ async function loadPurchases() {
         displayPurchases(purchases, isPurchasesExpanded);
     } catch (error) {
         console.error('Error loading purchases:', error);
-        purchasesList.innerHTML = '<p>Erreur lors du chargement des achats.</p>';
+        purchasesList.innerHTML = '<tr><td colspan="5">Erreur lors du chargement des achats.</td></tr>';
     }
 }
 
@@ -85,15 +90,21 @@ function displayPurchases(purchases, showAll) {
 
     const purchasesToShow = purchases.slice(0, displayLimit);
     if (purchasesToShow.length === 0) {
-        purchasesList.innerHTML = '<p>Aucun achat trouvé.</p>';
+        purchasesList.innerHTML = '<tr><td colspan="5">Aucun achat trouvé.</td></tr>';
         return;
     }
 
     purchasesToShow.forEach(purchase => {
-        const purchaseElement = document.createElement('p');
+        const row = document.createElement('tr');
         const date = new Date(purchase.date).toLocaleDateString('fr-FR');
-        purchaseElement.innerHTML = `- ${purchase.title} ${purchase.amount}€ ${date} ${purchase.firstname} ${purchase.name}`;
-        purchasesList.appendChild(purchaseElement);
+        row.innerHTML = `
+            <td>${purchase.title}</td>
+            <td class="amount">${purchase.amount}€</td>
+            <td>${date}</td>
+            <td>${purchase.firstname}</td>
+            <td>${purchase.name}</td>
+        `;
+        purchasesList.appendChild(row);
     });
 
     togglePurchases.textContent = showAll ? 'Voir moins' : 'Afficher tout';

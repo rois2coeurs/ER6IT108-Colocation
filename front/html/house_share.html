@@ -51,8 +51,20 @@
                     <span class="icon">≡</span>
                     <h2>Membres</h2>
                 </div>
-                <div class="card-content" id="members-list">
-                    <p>[Prénom] [NOM] [email@] [N°Tél]</p>
+                <div class="card-content">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Prénom</th>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Téléphone</th>
+                            </tr>
+                        </thead>
+                        <tbody id="members-list">
+                            <!-- Le contenu sera injecté dynamiquement par JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
                 <button class="toggle" id="toggle-members">Afficher Tout</button>
             </div>
@@ -62,8 +74,21 @@
                     <span class="icon">≡</span>
                     <h2>Achats (ordre décroissant)</h2>
                 </div>
-                <div class="card-content" id="purchases-list">
-                    <p>[Intitulé] [Montant] [Date] [Prénom] [NOM]</p>
+                <div class="card-content">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Intitulé</th>
+                                <th>Montant</th>
+                                <th>Date</th>
+                                <th>Prénom</th>
+                                <th>Nom</th>
+                            </tr>
+                        </thead>
+                        <tbody id="purchases-list">
+                            <!-- Le contenu sera injecté dynamiquement par JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
                 <button class="toggle" id="toggle-purchases">Afficher Tout</button>
             </div>
