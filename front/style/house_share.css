@@ -121,7 +121,7 @@ a {
     align-items: center;
     gap: 10px;
     margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--third-color);
     padding-bottom: 10px;
 }
 
@@ -142,7 +142,7 @@ a {
 
 .member-item, .purchase-item {
     padding: 10px;
-    border-bottom: 1px solid #f3f3f3;
+    border-bottom: 1px solid var(--third-color);
 }
 
 .member-item:last-child, .purchase-item:last-child {
@@ -151,7 +151,7 @@ a {
 
 .toggle {
     background-color: var(--secondary-color);
-    color: white;
+    color: var(--third-color);
     border: none;
     border-radius: 8px;
     padding: 10px 15px;
@@ -167,8 +167,8 @@ a {
 
 /* Footer */
 footer {
-    background-color: #0e1419;
-    color: white;
+    background-color: var(--primary-color);
+    color: var(--third-color);
     padding: 15px;
     text-align: center;
     margin-top: auto;
@@ -183,4 +183,48 @@ footer {
 .validators a {
     color: var(--accent-color);
     text-decoration: underline;
+}
+
+/* Styles for the tabs */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+.data-table th, 
+.data-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--third-color);
+}
+
+.data-table th {
+    background-color: var(--third-color);
+    font-weight: 500;
+    color: var(--accent-color);
+}
+
+.data-table tr:hover {
+    background-color: var(--third-color);
+}
+
+.data-table .amount {
+    text-align: left;
+    font-weight: 500;
+}
+
+/* for when the tab is empty */
+.data-table td[colspan] {
+    text-align: center;
+    padding: 20px;
+    color: var(--accent-color);
+    font-style: italic;
+}
+
+.data-table th[colspan] {
+    text-align: center;
+    padding: 20px;
+    color: var(--accent-color);
+    font-style: italic;
 }
