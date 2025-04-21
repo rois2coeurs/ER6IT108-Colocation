@@ -2,6 +2,7 @@ import authRoutes from "./routes/authRoutes.ts";
 import houseShareRoutes from "./routes/houseShareRoutes.ts";
 import usersRoutes from "./routes/usersRoutes.ts";
 import transferRoutes  from "./routes/transferRoutes.ts";
+import purchaseRoutes from "./routes/purchaseRoutes.ts";
 import {SafeDisplayError} from "./errors/SafeDisplayError.ts";
 
 Bun.spawn(["bun", "run", "migrator.ts"], {
@@ -17,6 +18,7 @@ Bun.serve({
         ...houseShareRoutes,
         ...usersRoutes,
         ...transferRoutes,
+        ...purchaseRoutes,
         '/health': new Response("OK", {status: 200}),
     },
     error(error: Error) {
