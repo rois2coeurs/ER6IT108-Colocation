@@ -3,7 +3,7 @@ export default defineNuxtRouteMiddleware(async to => {
         return;
     }
     if (!localStorage.getItem('token')) {
-        return navigateTo('/login');
+        return navigateTo('/login?redirect=' + to.path);
     }
     const {$apiClient} = useNuxtApp();
 
@@ -12,7 +12,7 @@ export default defineNuxtRouteMiddleware(async to => {
         if (!res || !res.ok) {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            return navigateTo('/login');
+            return navigateTo('/login?redirect=' + to.path);
         }
     }
 
