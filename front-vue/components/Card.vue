@@ -12,6 +12,8 @@ defineProps({
   },
   onButtonClick: Function,
   buttonIcon: String,
+  fullscreenButton: Boolean,
+  fullscreenClick: Function
 });
 </script>
 
@@ -20,6 +22,8 @@ defineProps({
     <div class="card-header">
       <Icon :name="icon" class="icon"/>
       <h2>{{ title }}</h2>
+      <Icon v-if="fullscreenButton" name="gridicons:fullscreen" class="interaction-icon" @click="fullscreenClick"
+            title="Ouvrir la vue avancée"/>
     </div>
 
     <div class="card-content">
@@ -56,6 +60,17 @@ defineProps({
   font-size: 24px;
   font-weight: bold;
   color: #B7999CFF;
+}
+
+.interaction-icon {
+  font-size: 24px;
+  color: #B7999CFF;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.interaction-icon:hover {
+  color: #EB5160FF;
 }
 
 .card-header h2 {
