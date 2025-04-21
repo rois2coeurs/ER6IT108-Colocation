@@ -5,7 +5,8 @@ BEGIN
               FROM stays
               WHERE NEW.user_id = user_id
                 AND NEW.id != id
-                AND NEW.exit_date IS NULL AND exit_date IS NULL) THEN
+                AND NEW.exit_date IS NULL
+                AND exit_date IS NULL) THEN
         RAISE EXCEPTION 'A stay already exists with overlapping dates where both exit dates are NULL';
     END IF;
 
@@ -13,7 +14,9 @@ BEGIN
               FROM stays
               WHERE NEW.user_id = user_id
                 AND NEW.id != id
-                AND NEW.exit_date IS NOT NULL AND NEW.exit_date > entry_date AND NEW.exit_date < COALESCE(exit_date, now())) THEN
+                AND NEW.exit_date IS NOT NULL
+                AND NEW.exit_date > entry_date
+                AND NEW.exit_date < COALESCE(exit_date, now())) THEN
 --                 AND NEW.exit_date IS NOT NULL AND NEW.exit_date BETWEEN entry_date AND COALESCE(exit_date, now())) THEN
         RAISE EXCEPTION 'A stay already exists with overlapping dates for the provided exit date';
     END IF;
@@ -22,7 +25,8 @@ BEGIN
               FROM stays
               WHERE NEW.user_id = user_id
                 AND NEW.id != id
-                AND NEW.entry_date > entry_date AND NEW.entry_date < COALESCE(exit_date, now())) THEN
+                AND NEW.entry_date > entry_date
+                AND NEW.entry_date < COALESCE(exit_date, now())) THEN
 --                 AND NEW.entry_date BETWEEN entry_date AND COALESCE(exit_date, now())) THEN
         RAISE EXCEPTION 'A stay already exists with overlapping dates for the provided entry date';
     END IF;
@@ -31,7 +35,8 @@ BEGIN
               FROM stays
               WHERE NEW.user_id = user_id
                 AND NEW.id != id
-                AND NEW.entry_date > entry_date AND exit_date IS NULL) THEN
+                AND NEW.entry_date > entry_date
+                AND exit_date IS NULL) THEN
         RAISE EXCEPTION 'A stay already exists with an open-ended exit date and a later entry date';
     END IF;
 
