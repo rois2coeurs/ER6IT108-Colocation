@@ -2,20 +2,22 @@ import {type BunRequest, sql} from "bun";
 import {AuthHelper} from "../helpers/authHelper.ts";
 
 export default {
-    '/me/house-share': {
-        GET: async (req: BunRequest<"/me/house-share">) => {
+    '/me': {
+        GET: async (req: BunRequest<"/me">) => {
             const userId = AuthHelper.checkAuth(req);
-            const houseShareId = await getUserHouseShare(userId);
-            return Response.json({houseShareId});
+            const ids = await getUserRelatedId(userId);
+            if (!ids) return Response.json(null);
+            return Response.json({houseShareId: ids.house_share_id, sharedFundId: ids.shared_fund_id});
         }
     }
 }
 
 
-async function getUserHouseShare(userId: number) {
-    const house = await sql`SELECT house_share_id
-                            FROM stays
-                            WHERE user_id = ${userId}
+async function getUserRelatedId(userId: number) {
+    const ids = await sql`SELECT stays.house_share_id, shared_fund.id AS shared_fund_id
+                          FROM stays
+                                   LEFT JOIN shared_fund ON stays.house_share_id = shared_fund.house_share_id
+                          WHERE user_id = ${userId}
                             AND exit_date IS NULL`;
-    return house[0]?.house_share_id;
+    return ids[0];
 }

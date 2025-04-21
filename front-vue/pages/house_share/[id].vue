@@ -131,10 +131,12 @@ async function leaveHouseShare() {
               <button class="contact-button" @click="displayMemberContact(member)" title="Contacter">
                 <Icon name="material-symbols:contact-page"/>
               </button>
-              <button v-if="isUserManager && !memberDisplayAll" class="transfer-button" @click="transferOwnership(member)" title="Transférer la propriété">
+              <button v-if="isUserManager && !memberDisplayAll" class="transfer-button"
+                      @click="transferOwnership(member)" title="Transférer la propriété">
                 <Icon name="mdi:crown"/>
               </button>
-              <button v-if="isUserManager && !memberDisplayAll" class="kick-button" @click="kickMember(member.id)" title="Expulser">
+              <button v-if="isUserManager && !memberDisplayAll" class="kick-button" @click="kickMember(member.id)"
+                      title="Expulser">
                 <Icon name="material-symbols:person-remove"/>
               </button>
             </td>
@@ -149,7 +151,13 @@ async function leaveHouseShare() {
     </Card>
     <Card title="Actions" icon="mdi:application" :display-button="false">
       <template #default>
-        <Button button-text="Quitter la colocation" icon="pepicons-pop:leave" :on-button-click="leaveHouseShare"></Button>
+        <button @click="leaveHouseShare" class="sharedFund-button">
+          <Icon name="icon-park-outline:funds"/>
+          Crée une cagnotte
+        </button>
+        <div style="height: 20px;"/>
+        <Button button-text="Quitter la colocation" icon="pepicons-pop:leave"
+                :on-button-click="leaveHouseShare"></Button>
       </template>
     </Card>
   </NuxtLayout>
@@ -199,9 +207,27 @@ async function leaveHouseShare() {
   border: none;
   border-radius: 5px;
 }
+
 .transfer-button:hover {
   background-color: #7a5300;
   cursor: pointer;
+}
+
+.sharedFund-button {
+  background-color: #202c34;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s;
+  font-weight: bold;
+}
+
+.sharedFund-button:hover {
+  background-color: #000000;
 }
 
 table {

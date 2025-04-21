@@ -91,6 +91,11 @@ export default {
             if (!house[0]) throw new SafeDisplayError("house-share not found!", 404);
             const membership = await checkMembership(userId, Number(id));
             if (!membership[0]) throw new SafeDisplayError("You are not a member of this house-share", 400);
+            if (house[0].manager_id === userId) {
+                const members = await getHouseShareMembers(Number(id), true);
+                if (members.length > 1) throw new SafeDisplayError("You cannot leave the house-share while being the manager if there are still members", 400);
+                await removeHouseShareManager(Number(id));
+            }
             await updateHouseShareMember(userId, Number(id));
 
             return Response.json({message: "Successfully left the house-share"}, {status: 200});
@@ -100,6 +105,7 @@ export default {
         PUT: async (req: BunRequest<"/house-share/:id/members/:memberId">) => {
             const userId = AuthHelper.checkAuth(req);
             const {id, memberId} = req.params;
+            if (userId === Number(memberId)) throw new SafeDisplayError("You cannot kick yourself", 400);
             const house = await getHouseShare(Number(id));
             if (!house[0]) throw new SafeDisplayError("house-share not found!", 404);
             if (house[0].manager_id !== userId) throw new UnauthorizedError("Only the manager can kick members");
@@ -134,7 +140,6 @@ export default {
         return Response.json(purchases);
         }
     }
-
 }
 
 async function getAllHouseShares() {
@@ -173,6 +178,16 @@ async function updateHouseShare(name: string, address: string, id: number) {
     address
     =
     ${address}
+    WHERE
+    id
+    =
+    ${id};`;
+}
+
+async function removeHouseShareManager(id: number) {
+    await sql`UPDATE house_share
+              SET manager_id =
+    NULL
     WHERE
     id
     =
