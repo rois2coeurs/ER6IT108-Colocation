@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const errors = ref<string[]>([]);
 await checkToken();
+const urlParams = new URLSearchParams(window.location.search);
 async function checkToken() {
   const {api_url} = JSON.parse(localStorage.getItem('config') || '{}');
   if (localStorage.getItem('token') && api_url) {
@@ -13,7 +14,7 @@ async function checkToken() {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     } else {
-      window.location.href = "/";
+      window.location.href = urlParams.get("redirect") || '/';
     }
   }
 }
@@ -36,7 +37,7 @@ onMounted(() => {
     if (res.ok) {
       localStorage.setItem('token', resData.token);
       localStorage.setItem('user', JSON.stringify(resData.user));
-      window.location.href = "/";
+      window.location.href = urlParams.get("redirect") || '/';
     } else {
       if (resData.error) {
         errors.value = [resData.error];
