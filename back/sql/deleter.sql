@@ -8,4 +8,3 @@ DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS migrationversion;
 DROP FUNCTION IF EXISTS purchases_checks;
 DROP FUNCTION IF EXISTS contributions_checks;
-DROP FUNCTION IF EXISTS purchases_checks;
