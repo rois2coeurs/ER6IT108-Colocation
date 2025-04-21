@@ -11,7 +11,7 @@ class ApiClient {
 
     private async request(method: string, path: string, data: any = null) {
         if (!localStorage.getItem('token')) {
-            window.location.href = '/login';
+            window.location.href = '/login?redirect=' + window.location.pathname;
             throw new Error('No token found in localStorage');
         }
 
