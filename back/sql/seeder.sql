@@ -37,7 +37,7 @@ VALUES ('Coloc des Amis', '123 Rue du Bonheur, Paris, 75001', 1),
 
 -- Create pots (cagnottes) for each colocation
 INSERT INTO shared_fund (amount, house_share_id)
-VALUES (0.00, 1),
+VALUES (10.00, 1),
        (0.00, 2),
        (0.00, 3);
 
