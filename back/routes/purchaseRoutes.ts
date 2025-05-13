@@ -13,6 +13,14 @@ export default {
             const limit = castToNumber(searchParams.get('limit'));
             const offset = castToNumber(searchParams.get('offset'));
             return Response.json(await getPurchases(userId, 5, offset));
+        },
+        POST: async (req: BunRequest<"/purchase">) => {
+            const currentUserId = AuthHelper.checkAuth(req);
+            const {title, amount, date, useShareFund} = await req.json();
+            console.log('useShareFund', useShareFund);
+            console.log('useShareFund === on', useShareFund === "on");
+            await createPurchase(currentUserId, title, amount, date, useShareFund === "on");
+            return Response.json({success: true});
         }
     }
 }
@@ -45,9 +53,45 @@ async function getPurchases(userId: number | null, limit: number | null, offset:
                                     ${userIdCondition}
                                 ORDER BY purchases.date DESC
                                 LIMIT ${limit} OFFSET ${offset} `;
-    const totalCount = await sql`SELECT COUNT(0) AS total_count FROM purchases ${userIdCondition}`;
+    const totalCount = await sql`SELECT COUNT(0) AS total_count
+                                 FROM purchases ${userIdCondition}`;
     return {
         purchases,
         total: totalCount[0]?.total_count ?? 0
     };
+}
+
+async function getUseShareFund(userId: number): Promise<number | null> {
+    const sharedFund = await sql`SELECT shared_fund.id
+                                 FROM shared_fund
+                                          INNER JOIN public.house_share hs on shared_fund.house_share_id = hs.id
+                                          INNER JOIN public.stays s on hs.id = s.house_share_id
+                                 WHERE s.user_id = ${userId}
+                                   AND s.exit_date IS NULL;`;
+    return sharedFund[0]?.id ?? null;
+}
+
+async function createPurchase(userId: number, title: string, amount: number, date: Date, useShareFund: boolean) {
+    if (!title || !amount || !date) throw new Error("Missing required fields");
+    if (amount <= 0) throw new Error("Amount must be greater than 0");
+    const houseShareId = await getUserHouseShareId(userId);
+    if (!houseShareId) throw new Error("You don't have a house share");
+    if (useShareFund) {
+        const sharedFundId = await getUseShareFund(userId);
+        if (!sharedFundId) throw new Error("You don't have a shared fund");
+        await sql`INSERT INTO purchases (user_id, title, amount, date, house_share_id, shared_fund_id)
+              VALUES (${userId}, ${title}, ${amount}, ${date}, ${houseShareId}, ${sharedFundId})`;
+    } else {
+        await sql`INSERT INTO purchases (user_id, title, amount, date, house_share_id)
+              VALUES (${userId}, ${title}, ${amount}, ${date}, ${houseShareId})`;
+    }
+}
+
+async function getUserHouseShareId(userId: number): Promise<number | null> {
+    const houseShare = await sql`SELECT house_share.id
+                                 FROM house_share
+                                          INNER JOIN public.stays s on house_share.id = s.house_share_id
+                                 WHERE s.user_id = ${userId}
+                                   AND s.exit_date IS NULL;`;
+    return houseShare[0]?.id ?? null;
 }
