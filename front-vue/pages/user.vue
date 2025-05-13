@@ -1,5 +1,92 @@
 <script setup lang="ts">
 const user = JSON.parse(localStorage.getItem("user") || "{}");
+const {$apiClient} = useNuxtApp();
+const isEditing = ref(false);
+const form = ref<HTMLFormElement | null>(null);
+const errors = ref<string[]>([]);
+const formData = ref({
+  name: user.name,
+  firstname: user.firstname,
+  phone_number: user.phone_number,
+  password: '',
+  password_confirmation: ''
+});
+
+function toggleEdit() {
+  isEditing.value = !isEditing.value;
+  if (!isEditing.value) {
+    formData.value.name = user.name;
+    formData.value.firstname = user.firstname;
+    formData.value.phone_number = user.phone_number;
+    formData.value.password = '';
+    formData.value.password_confirmation = '';
+    errors.value = [];
+  }
+}
+
+function checkPhoneNumber(phone_number: string) {
+  return phone_number.match(/^[0-9]{10}$/);
+}
+
+async function updateUserInfo() {
+  try {
+    errors.value = [];
+
+    // Check phone number
+    if (!checkPhoneNumber(formData.value.phone_number)) {
+      errors.value.push('Le numéro de téléphone doit contenir exactement 10 chiffres');
+      return;
+    }
+
+    // Check password if provided
+    if (formData.value.password) {
+      if (formData.value.password !== formData.value.password_confirmation) {
+        errors.value.push('Les mots de passe ne correspondent pas');
+        return;
+      }
+      if (formData.value.password.length < 8) {
+        errors.value.push('Le mot de passe doit contenir au moins 8 caractères');
+        return;
+      }
+      if (!formData.value.password.match(/[A-Z]/) && !formData.value.password.match(/[0-9]/)) {
+        errors.value.push('Le mot de passe doit contenir au moins une lettre majuscule ou un chiffre');
+        return;
+      }
+    }
+    
+    const data = {
+      name: formData.value.name,
+      firstname: formData.value.firstname,
+      phone_number: formData.value.phone_number,
+      password: formData.value.password || undefined
+    };
+    
+    const res = await $apiClient.put(`/users/${user.id}`, data);
+    const resData = await res.json();
+    
+    if (!res.ok) {
+      errors.value = [resData.error || 'Une erreur est survenue lors de la mise à jour de vos informations'];
+      return;
+    }
+    
+    // Update local user info
+    const updatedUser = {
+      ...user,
+      name: formData.value.name,
+      firstname: formData.value.firstname,
+      phone_number: formData.value.phone_number
+    };
+    
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    
+    isEditing.value = false;
+    window.location.reload();
+  } catch (error) {
+    console.error(error);
+    errors.value = ['Une erreur est survenue lors de la mise à jour de vos informations'];
+  }
+}
+
 function logout() {
   localStorage.removeItem("user");
   localStorage.removeItem("token");
@@ -12,13 +99,41 @@ function logout() {
     <Card
         title="Vos informations"
         icon="mdi:card-account-details-outline"
-        :display-button="false"
+        :button-text="isEditing ? 'Annuler' : 'Modifier'"
+        :display-button="true"
+        :on-button-click="toggleEdit"
     >
       <template #default>
-        <p>Nom: {{ user.name }}</p>
-        <p>Prénom: {{ user.firstname }}</p>
-        <p>Email: {{ user.mail }}</p>
-        <p>Numéro de téléphone: {{ user.phone_number }}</p>
+        <FormErrorBox :errors="errors" v-if="errors.length > 0" />
+        <div v-if="!isEditing">
+          <p>Nom: {{ user.name }}</p>
+          <p>Prénom: {{ user.firstname }}</p>
+          <p>Email: {{ user.mail }}</p>
+          <p>Numéro de téléphone: {{ user.phone_number }}</p>
+        </div>
+        <form v-else ref="form">
+          <div class="form-input-group">
+            <label for="firstname">Prénom</label>
+            <input type="text" id="firstname" v-model="formData.firstname" placeholder="John" required>
+          </div>
+          <div class="form-input-group">
+            <label for="name">Nom</label>
+            <input type="text" id="name" v-model="formData.name" placeholder="Smith" required>
+          </div>
+          <div class="form-input-group">
+            <label for="phone_number">Téléphone</label>
+            <input type="tel" id="phone_number" v-model="formData.phone_number" placeholder="0612345678" required>
+          </div>
+          <div class="form-input-group">
+            <label for="password">Nouveau mot de passe</label>
+            <input type="password" id="password" v-model="formData.password" placeholder="Laisser vide pour ne pas changer">
+          </div>
+          <div class="form-input-group">
+            <label for="password_confirmation">Confirmation du mot de passe</label>
+            <input type="password" id="password_confirmation" v-model="formData.password_confirmation" placeholder="Confirmer le nouveau mot de passe">
+          </div>
+          <button type="button" class="submit" @click="updateUserInfo">Confirmer</button>
+        </form>
       </template>
     </Card>
     <Card
@@ -34,5 +149,28 @@ function logout() {
 </template>
 
 <style scoped>
+.form-input-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
 
+.form-input-group input {
+  border-radius: 5px;
+  border: 1px solid #A19C9C;
+  background-color: #f8f8f8;
+  padding: 10px;
+}
+
+.submit {
+  margin-top: 20px;
+  background-color: #EB5160FF;
+  color: white;
+  padding: 10px;
+  margin-left: 5%;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  width: 90%;
+}
 </style>
