@@ -47,7 +47,7 @@ function getHeaderTitle(key: string) {
   }
 }
 
-async function postPurchase(purchase: Purchase) {
+async function postPurchase() {
   let data = getFormData(form);
   const res = await $apiClient.post('/purchase', data);
   const resData = await res.json();
