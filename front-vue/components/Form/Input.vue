@@ -1,36 +1,156 @@
 <script setup lang="ts">
-defineProps({
-  name: {
-    type: String,
-    required: true
-  },
-  label: {
-    type: String,
-    required: true
-  },
-  inputType: {
-    type: String,
-    default: 'text'
-  },
-  placeholder: {
-    type: String,
-    default: ''
+const user = JSON.parse(localStorage.getItem("user") || "{}");
+const {$apiClient} = useNuxtApp();
+const isEditing = ref(false);
+const formRef = ref<HTMLFormElement | null>(null);
+const errors = ref<string[]>([]);
+
+function toggleEdit() {
+  isEditing.value = !isEditing.value;
+  errors.value = [];
+  
+  if (isEditing.value) {
+    // Réinitialiser le formulaire au besoin
   }
-})
-const value = defineModel('value');
+}
+
+function checkPhoneNumber(phone_number: string) {
+  return phone_number.match(/^[0-9]{10}$/);
+}
+
+function checkPassword(password: string, passwordConfirmation: string) {
+  const errors = [];
+  
+  if (password !== passwordConfirmation) {
+    errors.push('Les mots de passe ne correspondent pas');
+  }
+  
+  if (password.length < 8) {
+    errors.push('Le mot de passe doit contenir au moins 8 caractères');
+  }
+  
+  if (!password.match(/[A-Z]/) && !password.match(/[0-9]/)) {
+    errors.push('Le mot de passe doit contenir au moins une lettre majuscule ou un chiffre');
+  }
+  
+  return errors;
+}
+
+async function updateUserInfo() {
+  try {
+    errors.value = [];
+    const formData = getFormData(formRef);
+    
+    // Check phone number
+    if (!checkPhoneNumber(formData.phone_number)) {
+      errors.value.push('Le numéro de téléphone doit contenir exactement 10 chiffres');
+      return;
+    }
+
+    // Check password if provided
+    if (formData.password) {
+      const passwordErrors = checkPassword(formData.password, formData.password_confirmation);
+      if (passwordErrors.length > 0) {
+        errors.value = passwordErrors;
+        return;
+      }
+    }
+    
+    const data = {
+      name: formData.name,
+      firstname: formData.firstname,
+      phone_number: formData.phone_number,
+      password: formData.password || undefined
+    };
+    
+    const res = await $apiClient.put(`/users/${user.id}`, data);
+    const resData = await res.json();
+    
+    if (!res.ok) {
+      errors.value = [resData.error || 'Une erreur est survenue lors de la mise à jour de vos informations'];
+      return;
+    }
+    
+    // Update local user info
+    const updatedUser = {
+      ...user,
+      name: formData.name,
+      firstname: formData.firstname,
+      phone_number: formData.phone_number
+    };
+    
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    
+    isEditing.value = false;
+    window.location.reload();
+  } catch (error) {
+    console.error(error);
+    errors.value = ['Une erreur est survenue lors de la mise à jour de vos informations'];
+  }
+}
+
+function logout() {
+  localStorage.removeItem("user");
+  localStorage.removeItem("token");
+  window.location.href = "/login";
+}
 </script>
 
 <template>
-  <div class="form-input-group">
-    <label :for="name">{{ label }}</label>
-    <div v-if="inputType === 'checkbox'" class="checkbox-wrapper">
-      <input type="checkbox" :name="name" v-model="value" :id="name"/><label :for="name"></label>
-    </div>
-    <input v-else :type="inputType" :name="name" v-model="value" :placeholder="placeholder"/>
-  </div>
+  <NuxtLayout title="Page utilisateur">
+    <Card
+        title="Vos informations"
+        icon="mdi:card-account-details-outline"
+        :button-text="isEditing ? 'Annuler' : 'Modifier'"
+        :display-button="true"
+        :on-button-click="toggleEdit"
+    >
+      <template #default>
+        <FormErrorBox :errors="errors" v-if="errors.length > 0" />
+        <div v-if="!isEditing">
+          <p>Nom: {{ user.name }}</p>
+          <p>Prénom: {{ user.firstname }}</p>
+          <p>Email: {{ user.mail }}</p>
+          <p>Numéro de téléphone: {{ user.phone_number }}</p>
+        </div>
+        <form v-else ref="formRef" id="update-user-form">
+          <div class="form-input-group">
+            <label for="firstname">Prénom</label>
+            <input type="text" name="firstname" id="firstname" :value="user.firstname" placeholder="John" required>
+          </div>
+          <div class="form-input-group">
+            <label for="name">Nom</label>
+            <input type="text" name="name" id="name" :value="user.name" placeholder="Smith" required>
+          </div>
+          <div class="form-input-group">
+            <label for="phone_number">Téléphone</label>
+            <input type="tel" name="phone_number" id="phone_number" :value="user.phone_number" placeholder="0612345678" required>
+          </div>
+          <div class="form-input-group">
+            <label for="password">Nouveau mot de passe</label>
+            <input type="password" name="password" id="password" placeholder="Laisser vide pour ne pas changer">
+          </div>
+          <div class="form-input-group">
+            <label for="password_confirmation">Confirmation du mot de passe</label>
+            <input type="password" name="password_confirmation" id="password_confirmation" placeholder="Confirmer le nouveau mot de passe">
+          </div>
+          <button type="button" class="submit" @click="updateUserInfo">Confirmer</button>
+        </form>
+      </template>
+    </Card>
+    <Card
+        title="Actions"
+        icon="mdi:application"
+        :display-button="false"
+    >
+      <template #default>
+        <Button :on-button-click="logout" button-text="Déconnexion" />
+      </template>
+    </Card>
+  </NuxtLayout>
 </template>
 
-<style>
+<style scoped>
 .form-input-group {
   margin-bottom: 20px;
   display: flex;
@@ -44,46 +164,15 @@ const value = defineModel('value');
   padding: 10px;
 }
 
-.checkbox-wrapper input[type=checkbox] {
-  height: 0;
-  width: 0;
-  display: none;
-}
-
-.checkbox-wrapper label {
-  --size: 35px;
-
+.submit {
+  margin-top: 20px;
+  background-color: #EB5160FF;
+  color: white;
+  padding: 10px;
+  margin-left: 5%;
+  border-radius: 10px;
+  border: none;
   cursor: pointer;
-  width: var(--size);
-  height: calc(var(--size) / 2);
-  background: grey;
-  display: block;
-  border-radius: 100px;
-  position: relative;
-}
-
-.checkbox-wrapper label:after {
-  content: '';
-  position: absolute;
-  top: 6%;
-  left: 2.5%;
-  width: calc(50% - 5%);
-  height: calc(100% - 11%);
-  background: #fff;
-  border-radius: 90px;
-  transition: 0.3s;
-}
-
-.checkbox-wrapper input:checked + label {
-  background: #EB5160FF;
-}
-
-.checkbox-wrapper input:checked + label:after {
-  left: calc(100% - 2.5%);
-  transform: translateX(-100%);
-}
-
-.checkbox-wrapper label:active:after {
-  width: 55%;
+  width: 90%;
 }
 </style>
