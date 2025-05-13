@@ -46,7 +46,6 @@ export default {
             if (Number(amount) <= 0) throw new SafeDisplayError("Amount must be greater than 0", 400);
             
             await addContribution(userId, Number(id), Number(amount));
-            await updateSharedFundAmount(Number(id), Number(amount));
             
             return Response.json({message: "Contribution added successfully"});
         }
