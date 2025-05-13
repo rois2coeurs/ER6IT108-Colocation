@@ -11,6 +11,10 @@ defineProps({
   inputType: {
     type: String,
     default: 'text'
+  },
+  placeholder: {
+    type: String,
+    default: ''
   }
 })
 const value = defineModel('value');
@@ -22,7 +26,7 @@ const value = defineModel('value');
     <div v-if="inputType === 'checkbox'" class="checkbox-wrapper">
       <input type="checkbox" :name="name" v-model="value" :id="name"/><label :for="name"></label>
     </div>
-    <input v-else :type="inputType" :name="name" v-model="value"/>
+    <input v-else :type="inputType" :name="name" v-model="value" :placeholder="placeholder"/>
   </div>
 </template>
 
