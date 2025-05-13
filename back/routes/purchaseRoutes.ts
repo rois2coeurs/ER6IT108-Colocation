@@ -17,16 +17,15 @@ export default {
         POST: async (req: BunRequest<"/purchase">) => {
             const currentUserId = AuthHelper.checkAuth(req);
             const {title, amount, date, useShareFund} = await req.json();
-            console.log('useShareFund', useShareFund);
-            console.log('useShareFund === on', useShareFund === "on");
-            await createPurchase(currentUserId, title, amount, date, useShareFund === "on");
+            const amountNum = Number(amount);
+            const dateObj = new Date(date);
+            if (isNaN(amountNum) || isNaN(dateObj.getTime())) {
+                throw new Error("Invalid amount or date format");
+            }
+            await createPurchase(currentUserId, title, amountNum, dateObj, useShareFund === "on");
             return Response.json({success: true});
         }
     }
-}
-
-async function sleep(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function isAdmin(userId: number): Promise<boolean> {
