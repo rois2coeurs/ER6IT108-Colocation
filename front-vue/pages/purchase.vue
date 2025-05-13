@@ -46,16 +46,30 @@ function getHeaderTitle(key: string) {
       return key;
   }
 }
+
+async function postPurchase(purchase: Purchase) {
+  let data = getFormData(form);
+  const res = await $apiClient.post('/purchase', data);
+  const resData = await res.json();
+  if (!res.ok) {
+    alert(resData.error);
+    return;
+  }
+}
+
+const form = ref<HTMLFormElement | null>(null);
 </script>
 
 <template>
   <NuxtLayout title="Mes paiements">
     <Card title="Nouvel achat" icon="bx:bxs-purchase-tag" button-icon="bx:bxs-plus-circle"
-          button-text="Déclarer un nouvel achat">
-      <FormInput input-type="text" name="name" label="Nom de l'achat"/>
-      <FormInput input-type="number" name="amount" label="Montant"/>
-      <FormInput input-type="checkbox" name="use-sharefund" label="Utiliser la cagnotte"/>
-      <FormInput input-type="date" name="date" label="Date de l'achat"/>
+          button-text="Déclarer un nouvel achat" :on-button-click="postPurchase">
+      <form ref="form">
+        <FormInput input-type="text" name="title" label="Nom de l'achat"/>
+        <FormInput input-type="number" name="amount" label="Montant"/>
+        <FormInput input-type="checkbox" name="useShareFund" label="Utiliser la cagnotte"/>
+        <FormInput input-type="date" name="date" label="Date de l'achat"/>
+      </form>
     </Card>
     <Card title="Historique de vos achats" icon="mdi:history" :button-text="historyButtonText"
           :display-button="remaining > 0 " :on-button-click="loadMorePurchases" fullscreen-button
