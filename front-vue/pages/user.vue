@@ -118,7 +118,7 @@ function logout() {
           </div>
           <div class="form-input-group">
             <label for="name">Nom</label>
-            <input type="text" id="name" v-model="formData.name" placeholder="Smith" required>
+            <input type="text" id="name" v-model="formData.name" placeholder="Doe" required>
           </div>
           <div class="form-input-group">
             <label for="phone_number">Téléphone</label>
