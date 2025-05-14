@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+#     branches: [ "main" ]
 
 jobs:
   build:
@@ -23,7 +23,7 @@ jobs:
         name: Build and push frontend
         uses: docker/build-push-action@v6
         with:
-          context: "{{defaultContext}}:front"
+          context: "{{defaultContext}}:front-vue"
           push: true
           tags: ghcr.io/rois2coeurs/coloc-front:latest
           platforms: linux/amd64,linux/arm64
