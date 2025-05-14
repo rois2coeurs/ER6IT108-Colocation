@@ -102,7 +102,7 @@ function logout() {
         title="Vos informations"
         icon="mdi:card-account-details-outline"
         :button-text="isEditing ? 'Annuler' : 'Modifier'"
-        :display-button="true"
+        :display-button="!isEditing"
         :on-button-click="toggleEdit"
     >
       <FormErrorBox :errors="errors" v-if="errors.length > 0" />
@@ -113,12 +113,15 @@ function logout() {
         <p>Numéro de téléphone: {{ user.phone_number }}</p>
       </div>
       <form v-else ref="form" class="form-input-group">
-          <FormInput input-type="text" id="firstname" label="Prénom" v-model="formData.firstname" placeholder="John" required/>
-          <FormInput input-type="text" id="name" label="Nom" v-model="formData.name" placeholder="Doe" required/>
-          <FormInput input-type="tel" id="phone_number" label="Téléphone" v-model="formData.phone_number" placeholder="0612345678" required/>
-          <FormInput input-type="password" id="password" label="Nouveau mot de passe" v-model="formData.password" placeholder="Laisser vide pour ne pas changer"/>
-          <FormInput input-type="password" id="password_confirmation" label="Confirmation du mot de passe" v-model="formData.password_confirmation" placeholder="Confirmer le nouveau mot de passe"/>
-        <button input-type="button" class="submit" @click="updateUserInfo">Confirmer</button>
+          <FormInput input-type="text" name="firstname" id="firstname" label="Prénom" v-model="formData.firstname" placeholder="John" required/>
+          <FormInput input-type="text" name="name" id="name" label="Nom" v-model="formData.name" placeholder="Doe" required/>
+          <FormInput input-type="tel" name="phone_number" id="phone_number" label="Téléphone" v-model="formData.phone_number" placeholder="0612345678" required/>
+          <FormInput input-type="password" name="password" id="password" label="Nouveau mot de passe" v-model="formData.password" placeholder="Laisser vide pour ne pas changer"/>
+          <FormInput input-type="password" name="password_confirmation" id="password_confirmation" label="Confirmation du mot de passe" v-model="formData.password_confirmation" placeholder="Confirmer le nouveau mot de passe"/>
+        <div class="button-group">
+          <button input-type="button" class="submit" @click="updateUserInfo">Confirmer</button>
+          <button input-type="button" class="cancel">Annuler</button>
+        </div>
       </form>
     </Card>
     <Card
@@ -152,10 +155,27 @@ function logout() {
   background-color: #EB5160FF;
   color: white;
   padding: 10px;
-  margin-left: 5%;
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  width: 90%;
+  width: 45%;
+  margin-right: 5%;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.cancel {
+  margin-top: 20px;
+  background-color: #808080;
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  width: 45%;
+  margin-left: 5%;
 }
 </style>
