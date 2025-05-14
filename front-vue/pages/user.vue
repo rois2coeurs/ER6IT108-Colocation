@@ -89,8 +89,6 @@ async function updateUserInfo() {
   }
 }
 
-
-
 function logout() {
   localStorage.removeItem("user");
   localStorage.removeItem("token");
@@ -107,33 +105,21 @@ function logout() {
         :display-button="true"
         :on-button-click="toggleEdit"
     >
-      <template #default>
-        <FormErrorBox :errors="errors" v-if="errors.length > 0" />
-        <div v-if="!isEditing">
-          <p>Nom: {{ user.name }}</p>
-          <p>Prénom: {{ user.firstname }}</p>
-          <p>Email: {{ user.mail }}</p>
-          <p>Numéro de téléphone: {{ user.phone_number }}</p>
-        </div>
-        <form v-else ref="form">
-          <div class="form-input-group">
-            <FormInput type="text" id="firstname" label="Prénom" v-model="formData.firstname" placeholder="John" required/>
-          </div>
-          <div class="form-input-group">
-            <FormInput type="text" id="name" label="Nom" v-model="formData.name" placeholder="Doe" required/>
-          </div>
-          <div class="form-input-group">
-            <FormInput type="tel" id="phone_number" label="Téléphone" v-model="formData.phone_number" placeholder="0612345678" required/>
-          </div>
-          <div class="form-input-group">
-            <FormInput type="password" id="password" label="Nouveau mot de passe" v-model="formData.password" placeholder="Laisser vide pour ne pas changer"/>
-          </div>
-          <div class="form-input-group">
-            <FormInput type="password" id="password_confirmation" label="Confirmation du mot de passe" v-model="formData.password_confirmation" placeholder="Confirmer le nouveau mot de passe"/>
-          </div>
-          <button type="button" class="submit" @click="updateUserInfo">Confirmer</button>
-        </form>
-      </template>
+      <FormErrorBox :errors="errors" v-if="errors.length > 0" />
+      <div v-if="!isEditing">
+        <p>Nom: {{ user.name }}</p>
+        <p>Prénom: {{ user.firstname }}</p>
+        <p>Email: {{ user.mail }}</p>
+        <p>Numéro de téléphone: {{ user.phone_number }}</p>
+      </div>
+      <form v-else ref="form" class="form-input-group">
+          <FormInput input-type="text" id="firstname" label="Prénom" v-model="formData.firstname" placeholder="John" required/>
+          <FormInput input-type="text" id="name" label="Nom" v-model="formData.name" placeholder="Doe" required/>
+          <FormInput input-type="tel" id="phone_number" label="Téléphone" v-model="formData.phone_number" placeholder="0612345678" required/>
+          <FormInput input-type="password" id="password" label="Nouveau mot de passe" v-model="formData.password" placeholder="Laisser vide pour ne pas changer"/>
+          <FormInput input-type="password" id="password_confirmation" label="Confirmation du mot de passe" v-model="formData.password_confirmation" placeholder="Confirmer le nouveau mot de passe"/>
+        <button input-type="button" class="submit" @click="updateUserInfo">Confirmer</button>
+      </form>
     </Card>
     <Card
         title="Actions"

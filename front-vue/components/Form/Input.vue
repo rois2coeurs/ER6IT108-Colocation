@@ -115,19 +115,19 @@ function logout() {
         </div>
         <form v-else ref="formRef" id="update-user-form">
           <div class="form-input-group">
-            <FormInput type="text" name="firstname" id="firstname" label="Prénom" :value="user.firstname" placeholder="John" required/>
+            <input type="text" name="firstname" id="firstname" label="Prénom" :value="user.firstname" placeholder="John" required/>
           </div>
           <div class="form-input-group">
-            <FormInput type="text" name="name" id="name" label="Nom" :value="user.name" placeholder="Smith" required/>
+            <input type="text" name="name" id="name" label="Nom" :value="user.name" placeholder="Smith" required/>
           </div>
           <div class="form-input-group">
-            <FormInput type="tel" name="phone_number" id="phone_number" label="Téléphone" :value="user.phone_number" placeholder="0612345678" required/>
+            <input type="tel" name="phone_number" id="phone_number" label="Téléphone" :value="user.phone_number" placeholder="0612345678" required/>
           </div>
           <div class="form-input-group">
-            <FormInput type="password" name="password" id="password" label="Nouveau mot de passe" placeholder="Laisser vide pour ne pas changer"/>
+            <input type="password" name="password" id="password" label="Nouveau mot de passe" placeholder="Laisser vide pour ne pas changer"/>
           </div>
           <div class="form-input-group">
-            <FormInput type="password" name="password_confirmation" id="password_confirmation" label="Confirmation du mot de passe" placeholder="Confirmer le nouveau mot de passe"/>
+            <input type="password" name="password_confirmation" id="password_confirmation" label="Confirmation du mot de passe" placeholder="Confirmer le nouveau mot de passe"/>
           </div>
           <button type="button" class="submit" @click="updateUserInfo">Confirmer</button>
         </form>
