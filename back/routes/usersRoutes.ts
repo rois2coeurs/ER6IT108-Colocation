@@ -51,7 +51,7 @@ async function getUserRelatedId(userId: number) {
     return ids[0];
 }
 
-async function updateUserWithPassword(userId: number, name: string, firstname: string, phone_number: string, password: string) {
+async function updateUserWithPassword(userId: number, firstname: string, name: string, phone_number: string, password: string) {
     return sql`UPDATE users 
                SET name = ${name}, 
                    firstname = ${firstname}, 

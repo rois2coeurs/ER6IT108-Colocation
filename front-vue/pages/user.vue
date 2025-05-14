@@ -5,8 +5,8 @@ const isEditing = ref(false);
 const form = ref<HTMLFormElement | null>(null);
 const errors = ref<string[]>([]);
 const formData = ref({
-  firstname: user.firstname,
   name: user.name,
+  firstname: user.firstname,
   phone_number: user.phone_number,
   password: '',
   password_confirmation: ''
@@ -15,8 +15,8 @@ const formData = ref({
 function toggleEdit() {
   isEditing.value = !isEditing.value;
   if (!isEditing.value) {
-    formData.value.firstname = user.firstname;
     formData.value.name = user.name;
+    formData.value.firstname = user.firstname;
     formData.value.phone_number = user.phone_number;
     formData.value.password = '';
     formData.value.password_confirmation = '';
@@ -49,11 +49,18 @@ async function updateUserInfo() {
     
     const res = await $apiClient.put(`/users/${user.id}`, data);
     
+    if (!res.ok) {
+      const resData = await res.json();
+      errors.value = [resData.error || 'Une erreur est survenue lors de la mise à jour de vos informations'];
+      console.log("errata");
+      return;
+    }
+
     // Update local user info
     const updatedUser = {
       ...user,
-      firstname: data.firstname,
       name: data.name,
+      firstname: data.firstname,
       phone_number: data.phone_number
     };
     
