@@ -174,7 +174,7 @@ function getHeaderTitle(key: string) {
         </tr>
       </table>
     </Card>
-    <Card title="Achats (ordre décroissant)" icon="mdi:history" :display-button="false " fullscreen-button
+    <Card title="Achats (ordre décroissant)" icon="mdi:history" :display-button="false" fullscreen-button
           :fullscreen-click="() => isModalOpen = true">
       <table v-if="purchases.length > 0">
         <tr v-for="(purchase, index) in purchases" :key="index" class="member-item">
