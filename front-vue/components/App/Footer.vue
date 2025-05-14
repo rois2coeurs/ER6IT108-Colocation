@@ -2,8 +2,8 @@
   <footer>
     <div class="footer-content">
       <div class="validators">
-        <a href="https://validator.w3.org/nu/?doc=[URL]" target="_blank">HTML Validation</a>
-        <a href="https://jigsaw.w3.org/css-validator/validator?uri=[URL]" target="_blank">CSS Validation</a>
+        <a href="https://validator.w3.org/nu/?doc=https://coloc.valentinraillard.fr/login" target="_blank">HTML Validation</a>
+        <a href="https://jigsaw.w3.org/css-validator/validator?uri=https://coloc.valentinraillard.fr/login" target="_blank">CSS Validation</a>
       </div>
     </div>
   </footer>
