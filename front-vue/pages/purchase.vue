@@ -49,13 +49,26 @@ function getHeaderTitle(key: string) {
 
 async function postPurchase() {
   let data = getFormData(form);
+  if (!data || !data.title || !data.amount || !data.date) {
+    errors.value = ['Veuillez remplir tous les champs.'];
+    return;
+  }
+  if (new Date(data.date) > new Date()) {
+    errors.value = ["La date ne peut pas être dans le futur."];
+    return;
+  }
   const res = await $apiClient.post('/purchase', data);
-  const resData = await res.json();
   if (!res.ok) {
+    const resData = await res.json();
     alert(resData.error);
     return;
   }
+  purchases.value = [];
+  await loadPurchases();
+  form.value?.reset();
 }
+
+const errors = ref<string[]>([]);
 
 const form = ref<HTMLFormElement | null>(null);
 </script>
@@ -65,6 +78,7 @@ const form = ref<HTMLFormElement | null>(null);
     <Card title="Nouvel achat" icon="bx:bxs-purchase-tag" button-icon="bx:bxs-plus-circle"
           button-text="Déclarer un nouvel achat" :on-button-click="postPurchase">
       <form ref="form">
+        <FormErrorBox :errors="errors"/>
         <FormInput input-type="text" name="title" label="Nom de l'achat"/>
         <FormInput input-type="number" name="amount" label="Montant"/>
         <FormInput input-type="checkbox" name="useShareFund" label="Utiliser la cagnotte"/>
