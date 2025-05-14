@@ -33,50 +33,34 @@ function checkPassword(password: string | null, passwordDouble: string | null) {
   return errors;
 }
 
-function checkPhoneNumber(phone_number: string) {
-  return phone_number.match(/^[0-9]{10}$/);
-}
-
 async function updateUserInfo() {
   try {
+    const data = getFormData(form);
     errors.value = [];
 
-    // Check phone number
-    if (!checkPhoneNumber(formData.value.phone_number)) {
-      errors.value.push('Le numéro de téléphone est mauvais');
-      return;
-    }
-
     // Check password if provided
-    if (formData.value.password) {
-      const passwordErrors = checkPassword(formData.value.password, formData.value.password_confirmation);
+    if (data.password) {
+      const passwordErrors = checkPassword(data.password, data.password_confirmation);
       if (passwordErrors.length > 0) {
         errors.value = passwordErrors;
         return;
       }
     }
     
-    const data = {
-      name: formData.value.name,
-      firstname: formData.value.firstname,
-      phone_number: formData.value.phone_number,
-      password: formData.value.password || undefined
-    };
-    
     const res = await $apiClient.put(`/users/${user.id}`, data);
-    const resData = await res.json();
-    
     if (!res.ok) {
+      const resData = await res.json();
       errors.value = [resData.error || 'Une erreur est survenue lors de la mise à jour de vos informations'];
+      console.log("errata");
       return;
     }
     
     // Update local user info
     const updatedUser = {
       ...user,
-      name: formData.value.name,
-      firstname: formData.value.firstname,
-      phone_number: formData.value.phone_number
+      name: data.name,
+      firstname: data.firstname,
+      phone_number: data.phone_number
     };
     
     localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -113,14 +97,14 @@ function logout() {
         <p>Numéro de téléphone: {{ user.phone_number }}</p>
       </div>
       <form v-else ref="form" class="form-input-group">
-          <FormInput input-type="text" name="firstname" id="firstname" label="Prénom" v-model="formData.firstname" placeholder="John" required/>
-          <FormInput input-type="text" name="name" id="name" label="Nom" v-model="formData.name" placeholder="Doe" required/>
-          <FormInput input-type="tel" name="phone_number" id="phone_number" label="Téléphone" v-model="formData.phone_number" placeholder="0772315227 ou +33772315227" required/>
-          <FormInput input-type="password" name="password" id="password" label="Nouveau mot de passe" v-model="formData.password" placeholder="Laisser vide pour ne pas changer"/>
-          <FormInput input-type="password" name="password_confirmation" id="password_confirmation" label="Confirmation du mot de passe" v-model="formData.password_confirmation" placeholder="Confirmer le nouveau mot de passe"/>
+          <FormInput input-type="text" name="firstname" id="firstname" label="Prénom" :value="formData.firstname" placeholder="John" required/>
+          <FormInput input-type="text" name="name" id="name" label="Nom" :value="formData.name" placeholder="Doe" required/>
+          <FormInput input-type="tel" name="phone_number" id="phone_number" label="Téléphone" :value="formData.phone_number" placeholder="0772315227 ou +33772315227" required/>
+          <FormInput input-type="password" name="password" id="password" label="Nouveau mot de passe" :value="formData.password" placeholder="Laisser vide pour ne pas changer"/>
+          <FormInput input-type="password" name="password_confirmation" id="password_confirmation" label="Confirmation du mot de passe" :value="formData.password_confirmation" placeholder="Confirmer le nouveau mot de passe"/>
         <div class="button-group">
           <button input-type="button" class="submit" @click="updateUserInfo">Confirmer</button>
-          <button input-type="button" class="cancel">Annuler</button>
+          <button class="cancel">Annuler</button>
         </div>
       </form>
     </Card>

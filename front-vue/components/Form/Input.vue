@@ -11,7 +11,11 @@ defineProps({
   inputType: {
     type: String,
     default: 'text'
-  }
+  },
+  placeholder: {
+    type: String,
+    default: ''
+  },
 })
 const value = defineModel('value');
 </script>
@@ -20,7 +24,7 @@ const value = defineModel('value');
   <div class="form-input-group">
     <label :for="name">{{ label }}</label>
     <div v-if="inputType === 'checkbox'" class="checkbox-wrapper">
-      <input type="checkbox" :name="name" v-model="value" :id="name"/><label :for="name"></label>
+      <input type="checkbox" :name="name" v-model="value" :id="name" :placeholder="placeholder"/><label :for="name"></label>
     </div>
     <input v-else :type="inputType" :name="name" v-model="value"/>
   </div>
