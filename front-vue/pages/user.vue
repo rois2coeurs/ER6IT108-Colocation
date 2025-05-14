@@ -43,7 +43,7 @@ async function updateUserInfo() {
 
     // Check phone number
     if (!checkPhoneNumber(formData.value.phone_number)) {
-      errors.value.push('Le numéro de téléphone doit contenir exactement 10 chiffres');
+      errors.value.push('Le numéro de téléphone est mauvais');
       return;
     }
 
@@ -115,7 +115,7 @@ function logout() {
       <form v-else ref="form" class="form-input-group">
           <FormInput input-type="text" name="firstname" id="firstname" label="Prénom" v-model="formData.firstname" placeholder="John" required/>
           <FormInput input-type="text" name="name" id="name" label="Nom" v-model="formData.name" placeholder="Doe" required/>
-          <FormInput input-type="tel" name="phone_number" id="phone_number" label="Téléphone" v-model="formData.phone_number" placeholder="0612345678" required/>
+          <FormInput input-type="tel" name="phone_number" id="phone_number" label="Téléphone" v-model="formData.phone_number" placeholder="0772315227 ou +33772315227" required/>
           <FormInput input-type="password" name="password" id="password" label="Nouveau mot de passe" v-model="formData.password" placeholder="Laisser vide pour ne pas changer"/>
           <FormInput input-type="password" name="password_confirmation" id="password_confirmation" label="Confirmation du mot de passe" v-model="formData.password_confirmation" placeholder="Confirmer le nouveau mot de passe"/>
         <div class="button-group">
