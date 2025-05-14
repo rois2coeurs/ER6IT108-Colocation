@@ -58,6 +58,10 @@ async function updateUserInfo() {
     };
     
     localStorage.setItem('user', JSON.stringify(updatedUser));
+
+    user.firstname = data.firstname;
+    user.name = data.name;
+    user.phone_number = data.phone_number;
     
     isEditing.value = false;
     window.location.reload();
