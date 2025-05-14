@@ -107,8 +107,8 @@ function logout() {
     >
       <FormErrorBox :errors="errors" v-if="errors.length > 0" />
       <div v-if="!isEditing">
-        <p>Nom: {{ user.name }}</p>
         <p>Prénom: {{ user.firstname }}</p>
+        <p>Nom: {{ user.name }}</p>
         <p>Email: {{ user.mail }}</p>
         <p>Numéro de téléphone: {{ user.phone_number }}</p>
       </div>
