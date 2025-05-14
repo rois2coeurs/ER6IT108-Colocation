@@ -60,7 +60,7 @@ async function updateUserWithPassword(userId: number, firstname: string, name: s
                WHERE id = ${userId}`;
 }
 
-async function updateUserWithoutPassword(userId: number, name: string, firstname: string, phone_number: string) {
+async function updateUserWithoutPassword(userId: number, firstname: string, name: string, phone_number: string) {
     return sql`UPDATE users 
                SET name = ${name}, 
                    firstname = ${firstname}, 

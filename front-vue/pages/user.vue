@@ -47,14 +47,7 @@ async function updateUserInfo() {
       }
     }
     
-    const res = await $apiClient.put(`/users/${user.id}`, data);
-    
-    if (!res.ok) {
-      const resData = await res.json();
-      errors.value = [resData.error || 'Une erreur est survenue lors de la mise à jour de vos informations'];
-      console.log("errata");
-      return;
-    }
+    await $apiClient.put(`/users/${user.id}`, data);
 
     // Update local user info
     const updatedUser = {
