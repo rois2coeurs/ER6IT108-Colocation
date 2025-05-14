@@ -24,6 +24,15 @@ function toggleEdit() {
   }
 }
 
+function checkPassword(password: string | null, passwordDouble: string | null) {
+  const errors: string[] = [];
+  if (!password || !passwordDouble) return ['Password is required'];
+  if (password !== passwordDouble) errors.push('Passwords do not match');
+  if (password.length < 8) errors.push('Password must be at least 8 characters');
+  if (!password.match(/[A-Z]/) && !password.match(/[0-9]/)) errors.push('Password must contain at least one uppercase letter or one number');
+  return errors;
+}
+
 function checkPhoneNumber(phone_number: string) {
   return phone_number.match(/^[0-9]{10}$/);
 }
@@ -40,16 +49,9 @@ async function updateUserInfo() {
 
     // Check password if provided
     if (formData.value.password) {
-      if (formData.value.password !== formData.value.password_confirmation) {
-        errors.value.push('Les mots de passe ne correspondent pas');
-        return;
-      }
-      if (formData.value.password.length < 8) {
-        errors.value.push('Le mot de passe doit contenir au moins 8 caractères');
-        return;
-      }
-      if (!formData.value.password.match(/[A-Z]/) && !formData.value.password.match(/[0-9]/)) {
-        errors.value.push('Le mot de passe doit contenir au moins une lettre majuscule ou un chiffre');
+      const passwordErrors = checkPassword(formData.value.password, formData.value.password_confirmation);
+      if (passwordErrors.length > 0) {
+        errors.value = passwordErrors;
         return;
       }
     }
@@ -86,6 +88,8 @@ async function updateUserInfo() {
     errors.value = ['Une erreur est survenue lors de la mise à jour de vos informations'];
   }
 }
+
+
 
 function logout() {
   localStorage.removeItem("user");
