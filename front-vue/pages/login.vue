@@ -52,7 +52,7 @@ onMounted(() => {
 
 <template>
   <NuxtLayout name="auth">
-    <form action="" method="post" id="login-form">
+    <form method="post" id="login-form">
       <FormErrorBox :errors="errors" />
       <div class="form-input-group">
         <label for="email">Email</label>
