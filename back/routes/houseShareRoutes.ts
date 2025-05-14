@@ -2,6 +2,7 @@ import {type BunRequest, sql} from "bun";
 import {AuthHelper} from "../helpers/authHelper.ts";
 import {SafeDisplayError} from "../errors/SafeDisplayError.ts";
 import {UnauthorizedError} from "../errors/UnauthorizedError.ts";
+import {castToNumber, setBounds} from "../utils.ts";
 
 export default {
     '/house-share': {
@@ -134,12 +135,24 @@ export default {
     },
     '/house-share/:id/purchases': {
     GET: async (req: BunRequest<"/house-share/:id/purchases">) => {
-        AuthHelper.checkAuth(req);
+        const currentUserId = AuthHelper.checkAuth(req);
+        const searchParams = new URLSearchParams(new URL(req.url).search);
         const {id} = req.params;
-        const purchases = await getHouseSharePurchases(Number(id));
+        const membership = await checkMembership(Number(currentUserId), Number(id));
+        if (!membership || !await isAdmin(currentUserId)) throw new UnauthorizedError("You are not authorized to view this user's purchases");
+        const limit = castToNumber(searchParams.get('limit'));
+        const offset = castToNumber(searchParams.get('offset'));
+        const purchases = await getPurchases(Number(id), limit, offset);
         return Response.json(purchases);
         }
     }
+}
+
+async function isAdmin(userId: number): Promise<boolean> {
+    const user = await sql`SELECT is_admin
+                           FROM users
+                           WHERE id = ${userId}`;
+    return user[0]?.is_admin as boolean;
 }
 
 async function getAllHouseShares() {
@@ -274,4 +287,27 @@ async function getHouseSharePurchases(id: number) {
                INNER JOIN shared_fund ON purchases.shared_fund_id = shared_fund.id
                WHERE shared_fund.house_share_id = ${id}
                ORDER BY purchases.date DESC;`;
+}
+
+async function getPurchases(houseShareId: number | null, limit: number | null, offset: number | null) {
+    limit = setBounds(limit, 1, 100);
+    offset ??= 0;
+    const purchases = await sql`SELECT purchases.id,
+                                       purchases.title,
+                                       purchases.amount,
+                                       purchases.date,
+                                       purchases.shared_fund_id IS NOT NULL AS shared_fund_set,
+                                       users.firstname,
+                                       users.name
+                                FROM purchases
+                                         LEFT JOIN users ON purchases.user_id = users.id
+                                WHERE purchases.house_share_id = ${houseShareId}
+                                ORDER BY purchases.date DESC, purchases.id DESC
+                                LIMIT ${limit} OFFSET ${offset} `;
+    const totalCount = await sql`SELECT COUNT(0) AS total_count
+                                 FROM purchases WHERE house_share_id = ${houseShareId}`;
+    return {
+        purchases,
+        total: totalCount[0]?.total_count ?? 0
+    };
 }

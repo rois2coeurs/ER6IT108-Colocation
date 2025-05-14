@@ -11,6 +11,8 @@ const memberDisplayAll = ref(false);
 const memberButtonTitle = computed(() => {
   return memberDisplayAll.value ? 'Afficher les membres actuelles' : 'Afficher les anciens membres';
 })
+const purchases = ref<Purchase[]>([]);
+
 const loadHouseShare = async () => {
   const res = await $apiClient.get(`/house-share/${route.params.id}`);
   const data = await res.json();
@@ -88,22 +90,52 @@ async function leaveHouseShare() {
   }
   window.location.href = '/';
 }
+
+async function loadPurchases() {
+  purchases.value = await loadData(5, 0);
+}
+async function loadData(limit: number, offset: number) {
+  const res = await $apiClient.get(`/house-share/${route.params.id}/purchases?offset=${offset}&limit=${limit}`);
+  const data = await res.json();
+  return data.purchases;
+}
+
+await loadPurchases();
+
+const isModalOpen = ref(false);
+function getHeaderTitle(key: string) {
+  switch (key) {
+    case 'title':
+      return 'Titre';
+    case 'amount':
+      return 'Montant (€)';
+    case 'date':
+      return 'Date';
+    case 'firstname':
+      return 'Prénom de l\'achteur';
+    case 'name':
+      return 'Nom de l\'achteur';
+    case 'shared_fund_set':
+      return 'Cagnotte';
+    default:
+      return key;
+  }
+}
+
 </script>
 
 <template>
   <NuxtLayout :title="title">
     <Card title="Informations" icon="mdi:information-slab-box-outline" :display-button="isUserManager"
           button-text="Modifier" :on-button-click="updateHouseShare">
-      <template #default>
-        <form v-if="isUserManager" ref="houseShareForm">
-          <FormInput name="name" label="Nom" :value="houseShare?.name"></FormInput>
-          <FormInput name="address" label="Adresse" :value="houseShare?.address"></FormInput>
-        </form>
-        <div v-else>
-          <p>Nom: {{ houseShare?.name }}</p>
-          <p>Adresse: {{ houseShare?.address }}</p>
-        </div>
-      </template>
+      <form v-if="isUserManager" ref="houseShareForm">
+        <FormInput name="name" label="Nom" :value="houseShare?.name"></FormInput>
+        <FormInput name="address" label="Adresse" :value="houseShare?.address"></FormInput>
+      </form>
+      <div v-else>
+        <p>Nom: {{ houseShare?.name }}</p>
+        <p>Adresse: {{ houseShare?.address }}</p>
+      </div>
     </Card>
     <Card
         title="Membres"
@@ -111,54 +143,59 @@ async function leaveHouseShare() {
         :on-button-click="switchMemberDisplayMode"
         :button-text="memberButtonTitle"
     >
-      <template #default>
-        <table>
-          <tr v-for="(member, index) in members" :key="index" class="member-item">
-            <td>
-              <Icon v-if="member.id === houseShare?.manager_id" name="mdi:crown" style="color: orange;"/>
-              {{ member.firstname }}
-            </td>
-            <td>{{ member.name }}</td>
-            <td>
-              <Icon name="mdi:calendar-start"/>
-              {{ new Date(member.entry_date).toLocaleDateString() }}
-            </td>
-            <td v-if="memberDisplayAll && member.exit_date">
-              <Icon name="mdi:exit-run"/>
-              {{ new Date(member.exit_date).toLocaleDateString() }}
-            </td>
-            <td v-if="member.id != getUserId()" class="action-buttons">
-              <button class="contact-button" @click="displayMemberContact(member)" title="Contacter">
-                <Icon name="material-symbols:contact-page"/>
-              </button>
-              <button v-if="isUserManager && !memberDisplayAll" class="transfer-button"
-                      @click="transferOwnership(member)" title="Transférer la propriété">
-                <Icon name="mdi:crown"/>
-              </button>
-              <button v-if="isUserManager && !memberDisplayAll" class="kick-button" @click="kickMember(member.id)"
-                      title="Expulser">
-                <Icon name="material-symbols:person-remove"/>
-              </button>
-            </td>
-          </tr>
-        </table>
-      </template>
+      <table>
+        <tr v-for="(member, index) in members" :key="index" class="member-item">
+          <td>
+            <Icon v-if="member.id === houseShare?.manager_id" name="mdi:crown" style="color: orange;"/>
+            {{ member.firstname }}
+          </td>
+          <td>{{ member.name }}</td>
+          <td>
+            <Icon name="mdi:calendar-start"/>
+            {{ new Date(member.entry_date).toLocaleDateString() }}
+          </td>
+          <td v-if="memberDisplayAll && member.exit_date">
+            <Icon name="mdi:exit-run"/>
+            {{ new Date(member.exit_date).toLocaleDateString() }}
+          </td>
+          <td v-if="member.id != getUserId()" class="action-buttons">
+            <button class="contact-button" @click="displayMemberContact(member)" title="Contacter">
+              <Icon name="material-symbols:contact-page"/>
+            </button>
+            <button v-if="isUserManager && !memberDisplayAll" class="transfer-button"
+                    @click="transferOwnership(member)" title="Transférer la propriété">
+              <Icon name="mdi:crown"/>
+            </button>
+            <button v-if="isUserManager && !memberDisplayAll" class="kick-button" @click="kickMember(member.id)"
+                    title="Expulser">
+              <Icon name="material-symbols:person-remove"/>
+            </button>
+          </td>
+        </tr>
+      </table>
     </Card>
-    <Card title="Achats (ordre décroissant)" icon="mdi:history">
-      <template>
-        <p>Content goes here</p>
-      </template>
+    <Card title="Achats (ordre décroissant)" icon="mdi:history" :display-button="false " fullscreen-button
+          :fullscreen-click="() => isModalOpen = true">
+      <table v-if="purchases.length > 0">
+        <tr v-for="(purchase, index) in purchases" :key="index" class="member-item">
+          <td>{{ purchase.title }}</td>
+          <td>{{ purchase.amount }}€</td>
+          <td>{{ new Date(purchase.date).toLocaleDateString() }}</td>
+        </tr>
+      </table>
+      <p v-else>Aucun achat trouvé.</p>
+      <Modal v-model="isModalOpen" title="Historique des achats">
+        <AdvancedTable :source-dataset-headers="getHeaderTitle" :data-source="loadData"/>
+      </Modal>
     </Card>
     <Card title="Actions" icon="mdi:application" :display-button="false">
-      <template #default>
-        <button @click="leaveHouseShare" class="sharedFund-button">
-          <Icon name="icon-park-outline:funds"/>
-          Crée une cagnotte
-        </button>
-        <div style="height: 20px;"/>
-        <Button button-text="Quitter la colocation" icon="pepicons-pop:leave"
-                :on-button-click="leaveHouseShare"></Button>
-      </template>
+      <button @click="leaveHouseShare" class="sharedFund-button">
+        <Icon name="icon-park-outline:funds"/>
+        Crée une cagnotte
+      </button>
+      <div style="height: 20px;"/>
+      <Button button-text="Quitter la colocation" icon="pepicons-pop:leave"
+              :on-button-click="leaveHouseShare"></Button>
     </Card>
   </NuxtLayout>
 </template>
