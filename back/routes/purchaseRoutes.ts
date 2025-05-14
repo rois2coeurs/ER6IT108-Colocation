@@ -2,6 +2,7 @@ import {type BunRequest, sql} from "bun";
 import {AuthHelper} from "../helpers/authHelper.ts";
 import {UnauthorizedError} from "../errors/UnauthorizedError.ts";
 import {castToNumber, setBounds} from "../utils.ts";
+import {SafeDisplayError} from "../errors/SafeDisplayError.ts";
 
 export default {
     '/purchase': {
@@ -20,7 +21,7 @@ export default {
             const amountNum = Number(amount);
             const dateObj = new Date(date);
             if (isNaN(amountNum) || isNaN(dateObj.getTime())) {
-                throw new Error("Invalid amount or date format");
+                throw new SafeDisplayError("Invalid amount or date format", 400);
             }
             await createPurchase(currentUserId, title, amountNum, dateObj, useShareFund === "on");
             return Response.json({success: true});
@@ -79,10 +80,10 @@ async function createPurchase(userId: number, title: string, amount: number, dat
         const sharedFundId = await getUseShareFund(userId);
         if (!sharedFundId) throw new Error("You don't have a shared fund");
         await sql`INSERT INTO purchases (user_id, title, amount, date, house_share_id, shared_fund_id)
-              VALUES (${userId}, ${title}, ${amount}, ${date}, ${houseShareId}, ${sharedFundId})`;
+              VALUES (${userId}, ${title}, ${amount}, ${date.toISOString()}, ${houseShareId}, ${sharedFundId})`;
     } else {
         await sql`INSERT INTO purchases (user_id, title, amount, date, house_share_id)
-              VALUES (${userId}, ${title}, ${amount}, ${date}, ${houseShareId})`;
+              VALUES (${userId}, ${title}, ${amount}, ${date.toISOString()}, ${houseShareId})`;
     }
 }
 
