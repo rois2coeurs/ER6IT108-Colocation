@@ -21,9 +21,9 @@ export default {
             
             if (currentUserId !== Number(id)) throw new UnauthorizedError("You are not authorized to update this user");
             
-            const {name, firstname, phone_number, password} = await req.json();
+            const {firstname, name, phone_number, password} = await req.json();
             
-            if (!name || !firstname || !phone_number) throw new SafeDisplayError("Missing required fields", 400);
+            if (!firstname || !name || !phone_number) throw new SafeDisplayError("Missing required fields", 400);
             
             if (!checkPhoneNumber(phone_number)) {
                 throw new SafeDisplayError("Phone number must only have digits and the length between 7 and 15 digits", 400);
@@ -31,9 +31,9 @@ export default {
             
             if (password) {
                 if(!checkPassword(password)) throw new SafeDisplayError("Password too weak", 400);
-                await updateUserWithPassword(Number(id), name, firstname, phone_number, password);
+                await updateUserWithPassword(Number(id), firstname, name, phone_number, password);
             } else {
-                await updateUserWithoutPassword(Number(id), name, firstname, phone_number);
+                await updateUserWithoutPassword(Number(id), firstname, name, phone_number);
             }
             
             return Response.json({message: "User updated successfully"});
