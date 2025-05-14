@@ -117,24 +117,19 @@ function logout() {
         </div>
         <form v-else ref="form">
           <div class="form-input-group">
-            <label for="firstname">Prénom</label>
-            <input type="text" id="firstname" v-model="formData.firstname" placeholder="John" required>
+            <FormInput type="text" id="firstname" label="Prénom" v-model="formData.firstname" placeholder="John" required/>
           </div>
           <div class="form-input-group">
-            <label for="name">Nom</label>
-            <input type="text" id="name" v-model="formData.name" placeholder="Doe" required>
+            <FormInput type="text" id="name" label="Nom" v-model="formData.name" placeholder="Doe" required/>
           </div>
           <div class="form-input-group">
-            <label for="phone_number">Téléphone</label>
-            <input type="tel" id="phone_number" v-model="formData.phone_number" placeholder="0612345678" required>
+            <FormInput type="tel" id="phone_number" label="Téléphone" v-model="formData.phone_number" placeholder="0612345678" required/>
           </div>
           <div class="form-input-group">
-            <label for="password">Nouveau mot de passe</label>
-            <input type="password" id="password" v-model="formData.password" placeholder="Laisser vide pour ne pas changer">
+            <FormInput type="password" id="password" label="Nouveau mot de passe" v-model="formData.password" placeholder="Laisser vide pour ne pas changer"/>
           </div>
           <div class="form-input-group">
-            <label for="password_confirmation">Confirmation du mot de passe</label>
-            <input type="password" id="password_confirmation" v-model="formData.password_confirmation" placeholder="Confirmer le nouveau mot de passe">
+            <FormInput type="password" id="password_confirmation" label="Confirmation du mot de passe" v-model="formData.password_confirmation" placeholder="Confirmer le nouveau mot de passe"/>
           </div>
           <button type="button" class="submit" @click="updateUserInfo">Confirmer</button>
         </form>
