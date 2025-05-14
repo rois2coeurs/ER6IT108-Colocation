@@ -5,8 +5,8 @@ const isEditing = ref(false);
 const form = ref<HTMLFormElement | null>(null);
 const errors = ref<string[]>([]);
 const formData = ref({
-  name: user.name,
   firstname: user.firstname,
+  name: user.name,
   phone_number: user.phone_number,
   password: '',
   password_confirmation: ''
@@ -15,8 +15,8 @@ const formData = ref({
 function toggleEdit() {
   isEditing.value = !isEditing.value;
   if (!isEditing.value) {
-    formData.value.name = user.name;
     formData.value.firstname = user.firstname;
+    formData.value.name = user.name;
     formData.value.phone_number = user.phone_number;
     formData.value.password = '';
     formData.value.password_confirmation = '';
@@ -48,18 +48,12 @@ async function updateUserInfo() {
     }
     
     const res = await $apiClient.put(`/users/${user.id}`, data);
-    if (!res.ok) {
-      const resData = await res.json();
-      errors.value = [resData.error || 'Une erreur est survenue lors de la mise à jour de vos informations'];
-      console.log("errata");
-      return;
-    }
     
     // Update local user info
     const updatedUser = {
       ...user,
-      name: data.name,
       firstname: data.firstname,
+      name: data.name,
       phone_number: data.phone_number
     };
     
@@ -97,11 +91,11 @@ function logout() {
         <p>Numéro de téléphone: {{ user.phone_number }}</p>
       </div>
       <form v-else ref="form" class="form-input-group">
-          <FormInput input-type="text" name="firstname" id="firstname" label="Prénom" :value="formData.firstname" placeholder="John" required/>
-          <FormInput input-type="text" name="name" id="name" label="Nom" :value="formData.name" placeholder="Doe" required/>
-          <FormInput input-type="tel" name="phone_number" id="phone_number" label="Téléphone" :value="formData.phone_number" placeholder="0772315227 ou +33772315227" required/>
-          <FormInput input-type="password" name="password" id="password" label="Nouveau mot de passe" :value="formData.password" placeholder="Laisser vide pour ne pas changer"/>
-          <FormInput input-type="password" name="password_confirmation" id="password_confirmation" label="Confirmation du mot de passe" :value="formData.password_confirmation" placeholder="Confirmer le nouveau mot de passe"/>
+          <FormInput input-type="text" name="firstname" label="Prénom" :value="formData.firstname" placeholder="John" required/>
+          <FormInput input-type="text" name="name" label="Nom" :value="formData.name" placeholder="Doe" required/>
+          <FormInput input-type="tel" name="phone_number" label="Téléphone" :value="formData.phone_number" placeholder="0772315227 ou +33772315227" required/>
+          <FormInput input-type="password" name="password" label="Nouveau mot de passe" :value="formData.password" placeholder="Laisser vide pour ne pas changer"/>
+          <FormInput input-type="password" name="password_confirmation" label="Confirmation du mot de passe" :value="formData.password_confirmation" placeholder="Confirmer le nouveau mot de passe"/>
         <div class="button-group">
           <button input-type="button" class="submit" @click="updateUserInfo">Confirmer</button>
           <button class="cancel">Annuler</button>
