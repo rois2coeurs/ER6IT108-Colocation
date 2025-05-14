@@ -11,4 +11,13 @@ function castToNumber(value: string | null): number | null {
     return isNaN(numberValue) ? null : numberValue;
 }
 
-export {setBounds, castToNumber};
+function checkPhoneNumber(phone_number: string) {
+    return phone_number.match(/\+?[0-9]{7,15}/);
+}
+
+function checkPassword(password: string) {
+    if (password.length < 8) return false;
+    return !(!password.match(/[A-Z]/) && !password.match(/[0-9]/));
+}
+
+export {setBounds, castToNumber, checkPhoneNumber, checkPassword};

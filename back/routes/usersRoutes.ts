@@ -2,6 +2,8 @@ import {type BunRequest, sql} from "bun";
 import {AuthHelper} from "../helpers/authHelper.ts";
 import {SafeDisplayError} from "../errors/SafeDisplayError.ts";
 import {UnauthorizedError} from "../errors/UnauthorizedError.ts";
+import {checkPhoneNumber} from "../utils.ts";
+import {checkPassword} from "../utils.ts";
 
 export default {
     '/me': {
@@ -23,13 +25,12 @@ export default {
             
             if (!name || !firstname || !phone_number) throw new SafeDisplayError("Missing required fields", 400);
             
-            if (!phone_number.match(/^[0-9]{10}$/)) {
-                throw new SafeDisplayError("Phone number must be exactly 10 digits", 400);
+            if (!checkPhoneNumber(phone_number)) {
+                throw new SafeDisplayError("Phone number must only have digits and the length between 7 and 15 digits", 400);
             }
             
             if (password) {
-                if (password.length < 8) throw new SafeDisplayError("Password too weak", 400);
-                if (!password.match(/[A-Z]/) && !password.match(/[0-9]/)) throw new SafeDisplayError("Password too weak", 400);
+                if(!checkPassword(password)) throw new SafeDisplayError("Password too weak", 400);
                 await updateUserWithPassword(Number(id), name, firstname, phone_number, password);
             } else {
                 await updateUserWithoutPassword(Number(id), name, firstname, phone_number);
