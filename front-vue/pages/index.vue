@@ -40,116 +40,22 @@
         </div>
       </template>
     </Card>
-    
-    <Card title="Technologies utilisées" icon="mdi:code-tags" :display-button="false">
+
+    <Card title="Explication du bouton" icon="mdi:history" :display-button="false">
       <template #default>
-        <div class="tech-section">
-          <h4>Frontend</h4>
-          <ul>
-            <li><strong>Vue.js / Nuxt.js 3</strong> - Framework JavaScript progressif pour la construction d'interfaces utilisateur</li>
-            <li><strong>TypeScript</strong> - Surensemble de JavaScript ajoutant des types statiques</li>
-            <li><strong>Nuxt Icon</strong> - Intégration d'icônes</li>
-            <li><strong>Nuxt Fonts</strong> - Gestion des polices d'écriture</li>
-          </ul>
-        </div>
+        <p class="intro-text">Un bouton qui en a beaucoup sous le ventre : <Icon name="gridicons:fullscreen"/></p>
+        <h3 class="section-title">L'incontournable !</h3>
         
-        <div class="tech-section">
-          <h4>Backend</h4>
-          <ul>
-            <li><strong>Bun.js</strong> - Runtime JavaScript</li>
-            <li><strong>TypeScript</strong> - Pour du backend</li>
-            <li><strong>PostgreSQL</strong> - Système de gestion de base de données relationnelle</li>
-          </ul>
-        </div>
-        
-        <div class="tech-section">
-          <h4>Outils de développement</h4>
-          <ul>
-            <li><strong>Docker</strong> - Pour la BD</li>
-            <li><strong>Git/GitHub</strong> - Gestion des versions et surtout les issues qu'il manque à Thor</li>
-          </ul>
+        <div class="feature-section">
+          <h4>L'historique de vos paiements à la vitesse de la lumière</h4>
+          <p>
+            La page des paiements est dotée d'un bouton aux allures de 4 flèches. En cliquant dessus vous vous retrouverez submergé de l'historique complet de vos paiements.
+            Ce bouton vous permettra de filtrer et d'arranger l'ordre de vos entrées de paiements en un clin d'œil.
+          </p>
         </div>
       </template>
     </Card>
-    
-    <Card title="Structure du projet" icon="mdi:folder-outline" :display-button="false">
-      <template #default>
-        <pre class="structure">
 
-ER6IT108-COLLOCATION/
-├── back/
-│   ├── routes/
-│   │   ├── authRoutes.ts
-│   │   ├── houseShareRoutes.ts
-│   │   ├── purchaseRoutes.ts
-│   │   ├── transferRoutes.ts
-│   │   ├── usersRoutes.ts
-│   │   └── sharedFundRoutes.ts
-│   ├── helpers/
-│   │   ├── authHelper.ts
-│   │   └── tokenHelper.ts
-│   ├── errors/
-│   │   ├── SafeDisplayError.ts
-│   │   └── UnauthorizedError.ts
-│   ├── sql/
-│   │   ├── migrations/
-│   │   │   ├── 1_Creation.sql
-│   │   │   ├── 2_Triggers.sql
-│   │   │   ├── 3_FixHouseShare.sql
-│   │   │   ├── 4_HouseShareTriggers.sql
-│   │   │   └── 5_PurchaseHouseShare.sql
-│   │   ├── deleter.sql
-│   │   └── seeder.sql
-│   └── tests/
-│       ├── database.test.ts
-│       └── tokenHelper.test.ts
-└── front-vue/
-    ├── components/
-    │   ├── App/
-    │   │   ├── Footer.vue
-    │   │   ├── Header.vue
-    │   │   └── NavBar.vue
-    │   ├── Form/
-    │   │   ├── ErrorBox.vue
-    │   │   └── Input.vue
-    │   ├── AdvancedTable.vue
-    │   ├── Button.vue
-    │   ├── Card.vue
-    │   ├── Loader.vue
-    │   └── Modal.vue
-    ├── layouts/
-    │   ├── auth.vue
-    │   └── default.vue
-    ├── middleware/
-    │   ├── config-loader.global.ts
-    │   └── validate-token.global.ts
-    ├── pages/
-    │   ├── house_share/
-    │   │   ├── [id].vue
-    │   │   └── index.vue
-    │   ├── shared_fund/
-    │   │   └── [id].vue
-    │   ├── index.vue
-    │   ├── login.vue
-    │   ├── purchase.vue
-    │   ├── register.vue
-    │   ├── transfer.vue
-    │   └── user.vue
-    ├── plugins/
-    │   └── api-client.ts
-    ├── types/
-    │   ├── house_share.d.ts
-    │   ├── member.d.ts
-    │   ├── purchase.d.ts
-    │   └── transfer.d.ts
-    └── utils/
-        ├── get-form-data.ts
-        └── get-user-id.ts
-
-        </pre>
-        <p>À la date du 13 mai 2025.</p>
-      </template>
-    </Card>
   </NuxtLayout>
 </template>
 
