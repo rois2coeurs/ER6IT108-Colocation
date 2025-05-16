@@ -42,22 +42,3 @@ CREATE TRIGGER update_shared_fund_amount_on_purchase
     FOR EACH ROW
     WHEN (NEW.shared_fund_id IS NOT NULL OR OLD.shared_fund_id IS NOT NULL)
 EXECUTE FUNCTION update_shared_fund_amount();
-
--- Modification de la fonction de contribution existante pour ne plus mettre à jour directement le montant de la cagnotte,
--- puisque le trigger s'en charge maintenant
-CREATE OR REPLACE FUNCTION contributions_checks() RETURNS TRIGGER AS
-$$
-BEGIN
-    IF ((SELECT house_share_id
-         FROM shared_fund
-         WHERE id = NEW.shared_fund_id) NOT IN
-        (SELECT house_share_id
-         FROM stays
-         WHERE user_id = NEW.user_id
-           AND NEW.date BETWEEN entry_date AND COALESCE(exit_date, now())))
-    THEN
-        RAISE EXCEPTION 'The user cannot contribute to a shared fund if he is not staying in the house share';
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
