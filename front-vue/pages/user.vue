@@ -1,11 +1,9 @@
 <script setup lang="ts">
-
 const user = ref(JSON.parse(localStorage.getItem("user") || "{}"));
 const {$apiClient} = useNuxtApp();
 let isEditing = ref(false);
 let form = ref<HTMLFormElement | null>(null);
 let errors = ref<string[]>([]);
-
 
 function toggleEdit() {
   isEditing.value = !isEditing.value;
@@ -33,9 +31,9 @@ async function updateUserInfo() {
         return;
       }
     }
-    
+
     const res = await $apiClient.put(`/users/${user.value.id}`, data);
-    if(!res.ok) {
+    if (!res.ok) {
       const data = await res.json();
       errors.value = [data.error];
       return;
@@ -50,7 +48,7 @@ async function updateUserInfo() {
     };
 
     localStorage.setItem('user', JSON.stringify(updatedUser));
-    
+
     user.value = updatedUser;
 
     isEditing.value = false;
@@ -76,7 +74,6 @@ function logout() {
         :display-button="!isEditing"
         :on-button-click="toggleEdit"
     >
-      <FormErrorBox :errors="errors"/>
       <div v-if="!isEditing">
         <p>Prénom: {{ user.firstname }}</p>
         <p>Nom: {{ user.name }}</p>
@@ -84,11 +81,15 @@ function logout() {
         <p>Numéro de téléphone: {{ user.phone_number }}</p>
       </div>
       <form v-else ref="form" class="form-input-group" @submit.prevent="updateUserInfo">
-          <FormInput input-type="text" name="firstname" label="Prénom" :value="user.firstname" placeholder="John" required/>
-          <FormInput input-type="text" name="name" label="Nom" :value="user.name" placeholder="Doe" required/>
-          <FormInput input-type="tel" name="phone_number" label="Téléphone" :value="user.phone_number" placeholder="0772315227 ou +33772315227" required/>
-          <FormInput input-type="password" name="password" label="Nouveau mot de passe" :value="user.password" placeholder="Laisser vide pour ne pas changer"/>
-          <FormInput input-type="password" name="password_confirmation" label="Confirmation du mot de passe" :value="user.password_confirmation" placeholder="Confirmer le nouveau mot de passe"/>
+        <FormErrorBox :errors="errors"/>
+        <FormInput name="firstname" label="Prénom" :value="user.firstname" placeholder="John"/>
+        <FormInput name="name" label="Nom" :value="user.name" placeholder="Doe"/>
+        <FormInput input-type="tel" name="phone_number" label="Téléphone" :value="user.phone_number"
+                   placeholder="0772315227 ou +33772315227"/>
+        <FormInput input-type="password" name="password" label="Nouveau mot de passe" :value="user.password"
+                   placeholder="Laisser vide pour ne pas changer"/>
+        <FormInput input-type="password" name="password_confirmation" label="Confirmation du mot de passe"
+                   :value="user.password_confirmation" placeholder="Confirmer le nouveau mot de passe"/>
         <div class="button-group">
           <button input-type="button" class="submit">Confirmer</button>
           <button class="cancel">Annuler</button>
@@ -100,9 +101,7 @@ function logout() {
         icon="mdi:application"
         :display-button="false"
     >
-      <template #default>
-        <Button :on-button-click="logout" button-text="Déconnexion" />
-      </template>
+      <Button :on-button-click="logout" button-text="Déconnexion"/>
     </Card>
   </NuxtLayout>
 </template>
