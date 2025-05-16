@@ -46,6 +46,7 @@ async function updateUserInfo() {
         return;
       }
     }
+    console.log("ddddd");
     
     await $apiClient.put(`/users/${user.id}`, data);
 
@@ -56,13 +57,14 @@ async function updateUserInfo() {
       firstname: data.firstname,
       phone_number: data.phone_number
     };
-    
-    localStorage.setItem('user', JSON.stringify(updatedUser));
+    console.log("dsssdddd");
 
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    
     user.firstname = data.firstname;
     user.name = data.name;
     user.phone_number = data.phone_number;
-    
+    console.log("dsssdssssddd");
     isEditing.value = false;
     window.location.reload();
   } catch (error) {
