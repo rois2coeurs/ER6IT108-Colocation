@@ -2,8 +2,7 @@ import {type BunRequest, sql} from "bun";
 import {AuthHelper} from "../helpers/authHelper.ts";
 import {SafeDisplayError} from "../errors/SafeDisplayError.ts";
 import {UnauthorizedError} from "../errors/UnauthorizedError.ts";
-import {checkPhoneNumber} from "../utils.ts";
-import {checkPassword} from "../utils.ts";
+import {checkPhoneNumber, checkPassword} from "../utils.ts";
 
 export default {
     '/me': {
@@ -18,24 +17,24 @@ export default {
         PUT: async (req: BunRequest<"/users/:id">) => {
             const currentUserId = AuthHelper.checkAuth(req);
             const {id} = req.params;
-            
+
             if (currentUserId !== Number(id)) throw new UnauthorizedError("You are not authorized to update this user");
-            
+
             const {firstname, name, phone_number, password} = await req.json();
-            
-            if (!firstname && !name && !phone_number && !password) throw new SafeDisplayError("Missing required fields", 400);
+
+            if (!firstname || !name || !phone_number) throw new SafeDisplayError("Missing required fields", 400);
 
             if (!checkPhoneNumber(phone_number)) {
                 throw new SafeDisplayError("Phone number must only have digits and the length between 7 and 15 digits", 400);
             }
-            
+
             if (password) {
                 if(!checkPassword(password)) throw new SafeDisplayError("Password too weak", 400);
                 await updateUserWithPassword(Number(id), firstname, name, phone_number, password);
             } else {
                 await updateUserWithoutPassword(Number(id), firstname, name, phone_number);
             }
-            
+
             return Response.json({message: "User updated successfully"});
         }
     }

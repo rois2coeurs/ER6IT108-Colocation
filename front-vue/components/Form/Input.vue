@@ -24,9 +24,9 @@ const value = defineModel('value');
   <div class="form-input-group">
     <label :for="name">{{ label }}</label>
     <div v-if="inputType === 'checkbox'" class="checkbox-wrapper">
-      <input type="checkbox" :name="name" v-model="value" :id="name" :placeholder="placeholder"/><label :for="name"></label>
+      <input type="checkbox" :name="name" v-model="value" :id="name"/><label :for="name"></label>
     </div>
-    <input v-else :type="inputType" :name="name" v-model="value"/>
+    <input v-else :type="inputType" :name="name" v-model="value" :placeholder="placeholder"/>
   </div>
 </template>
 
