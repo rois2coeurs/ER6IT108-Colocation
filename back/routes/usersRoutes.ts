@@ -24,7 +24,7 @@ export default {
             const {firstname, name, phone_number, password} = await req.json();
             
             if (!firstname && !name && !phone_number && !password) throw new SafeDisplayError("Missing required fields", 400);
-            
+
             if (!checkPhoneNumber(phone_number)) {
                 throw new SafeDisplayError("Phone number must only have digits and the length between 7 and 15 digits", 400);
             }
