@@ -1,31 +1,18 @@
 <script setup lang="ts">
-const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+const user = ref(JSON.parse(localStorage.getItem("user") || "{}"));
 const {$apiClient} = useNuxtApp();
-const isEditing = ref(false);
-const form = ref<HTMLFormElement | null>(null);
-const errors = ref<string[]>([]);
-const formData = ref({
-  name: user.name,
-  firstname: user.firstname,
-  phone_number: user.phone_number,
-  password: '',
-  password_confirmation: ''
-});
+let isEditing = ref(false);
+let form = ref<HTMLFormElement | null>(null);
+let errors = ref<string[]>([]);
+
 
 function toggleEdit() {
   isEditing.value = !isEditing.value;
-  if (!isEditing.value) {
-    formData.value.name = user.name;
-    formData.value.firstname = user.firstname;
-    formData.value.phone_number = user.phone_number;
-    formData.value.password = '';
-    formData.value.password_confirmation = '';
-    errors.value = [];
-  }
 }
 
 function checkPassword(password: string | null, passwordDouble: string | null) {
-  const errors: string[] = [];
+  let errors: string[] = [];
   if (!password || !passwordDouble) return ['Password is required'];
   if (password !== passwordDouble) errors.push('Passwords do not match');
   if (password.length < 8) errors.push('Password must be at least 8 characters');
@@ -35,38 +22,38 @@ function checkPassword(password: string | null, passwordDouble: string | null) {
 
 async function updateUserInfo() {
   try {
-    const data = getFormData(form);
+    let data = getFormData(form);
     errors.value = [];
 
     // Check password if provided
     if (data.password) {
-      const passwordErrors = checkPassword(data.password, data.password_confirmation);
+      let passwordErrors = checkPassword(data.password, data.password_confirmation);
       if (passwordErrors.length > 0) {
         errors.value = passwordErrors;
         return;
       }
     }
-    console.log("ddddd");
     
-    await $apiClient.put(`/users/${user.id}`, data);
+    const res = await $apiClient.put(`/users/${user.value.id}`, data);
+    if(!res.ok) {
+      const data = await res.json();
+      errors.value = [data.error];
+      return;
+    }
 
     // Update local user info
-    const updatedUser = {
-      ...user,
+    let updatedUser = {
+      ...user.value,
       name: data.name,
       firstname: data.firstname,
       phone_number: data.phone_number
     };
-    console.log("dsssdddd");
 
     localStorage.setItem('user', JSON.stringify(updatedUser));
     
-    user.firstname = data.firstname;
-    user.name = data.name;
-    user.phone_number = data.phone_number;
-    console.log("dsssdssssddd");
+    user.value = updatedUser;
+
     isEditing.value = false;
-    window.location.reload();
   } catch (error) {
     console.error(error);
     errors.value = ['Une erreur est survenue lors de la mise à jour de vos informations'];
@@ -89,21 +76,21 @@ function logout() {
         :display-button="!isEditing"
         :on-button-click="toggleEdit"
     >
-      <FormErrorBox :errors="errors" v-if="errors.length > 0" />
+      <FormErrorBox :errors="errors"/>
       <div v-if="!isEditing">
         <p>Prénom: {{ user.firstname }}</p>
         <p>Nom: {{ user.name }}</p>
         <p>Email: {{ user.mail }}</p>
         <p>Numéro de téléphone: {{ user.phone_number }}</p>
       </div>
-      <form v-else ref="form" class="form-input-group">
-          <FormInput input-type="text" name="firstname" label="Prénom" :value="formData.firstname" placeholder="John" required/>
-          <FormInput input-type="text" name="name" label="Nom" :value="formData.name" placeholder="Doe" required/>
-          <FormInput input-type="tel" name="phone_number" label="Téléphone" :value="formData.phone_number" placeholder="0772315227 ou +33772315227" required/>
-          <FormInput input-type="password" name="password" label="Nouveau mot de passe" :value="formData.password" placeholder="Laisser vide pour ne pas changer"/>
-          <FormInput input-type="password" name="password_confirmation" label="Confirmation du mot de passe" :value="formData.password_confirmation" placeholder="Confirmer le nouveau mot de passe"/>
+      <form v-else ref="form" class="form-input-group" @submit.prevent="updateUserInfo">
+          <FormInput input-type="text" name="firstname" label="Prénom" :value="user.firstname" placeholder="John" required/>
+          <FormInput input-type="text" name="name" label="Nom" :value="user.name" placeholder="Doe" required/>
+          <FormInput input-type="tel" name="phone_number" label="Téléphone" :value="user.phone_number" placeholder="0772315227 ou +33772315227" required/>
+          <FormInput input-type="password" name="password" label="Nouveau mot de passe" :value="user.password" placeholder="Laisser vide pour ne pas changer"/>
+          <FormInput input-type="password" name="password_confirmation" label="Confirmation du mot de passe" :value="user.password_confirmation" placeholder="Confirmer le nouveau mot de passe"/>
         <div class="button-group">
-          <button input-type="button" class="submit" @click="updateUserInfo">Confirmer</button>
+          <button input-type="button" class="submit">Confirmer</button>
           <button class="cancel">Annuler</button>
         </div>
       </form>

@@ -12,7 +12,7 @@ function castToNumber(value: string | null): number | null {
 }
 
 function checkPhoneNumber(phone_number: string) {
-    return phone_number.match(/\+?[0-9]{7,15}/);
+    return /^\+?[0-9]{7,15}$/.test(phone_number);
 }
 
 function checkPassword(password: string) {
