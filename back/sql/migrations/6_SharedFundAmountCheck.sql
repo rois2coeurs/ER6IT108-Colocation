@@ -40,5 +40,4 @@ CREATE TRIGGER update_shared_fund_amount_on_purchase
     AFTER INSERT OR UPDATE OR DELETE
     ON purchases
     FOR EACH ROW
-    WHEN (NEW.shared_fund_id IS NOT NULL OR OLD.shared_fund_id IS NOT NULL)
 EXECUTE FUNCTION update_shared_fund_amount();
