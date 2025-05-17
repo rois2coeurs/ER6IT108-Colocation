@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Loader from "~/components/Loader.vue";
+import {ref, computed, watch} from 'vue';
 
 const props = defineProps({
   dataSource: {
@@ -175,118 +176,409 @@ const paginatedDataset = computed(() => {
   const end = start + selectedLimit.value;
   return dataset.value.slice(start, end);
 });
+
+const visiblePages = computed(() => {
+  const maxVisiblePages = 5;
+  if (totalPages.value <= maxVisiblePages) {
+    return Array.from({length: totalPages.value}, (_, i) => i + 1);
+  }
+
+  const halfVisible = Math.floor(maxVisiblePages / 2);
+  let startPage = Math.max(currentPage.value - halfVisible, 1);
+  let endPage = startPage + maxVisiblePages - 1;
+
+  if (endPage > totalPages.value) {
+    endPage = totalPages.value;
+    startPage = Math.max(endPage - maxVisiblePages + 1, 1);
+  }
+
+  return Array.from({length: endPage - startPage + 1}, (_, i) => startPage + i);
+});
+
+const showFirstPageButton = computed(() => !visiblePages.value.includes(1));
+const showLastPageButton = computed(() => !visiblePages.value.includes(totalPages.value));
+
+const isEmpty = computed(() => sourceDataset.value.length === 0 && !loading.value);
 </script>
 
 <template>
-  <input type="text" placeholder="Search..." class="search-input" v-model="searchInput"/>
-  <Loader v-if="loading" class="center"/>
-  <div v-else class="table-container">
-    <table>
-      <tr class="font-bold">
-        <td v-for="(header, index) in Object.keys(sourceDataset[0])" :key="index">
-        <span @click="sort(header)" class="sortable">
-          <Icon :name="sortIcon(header)"/>
-          {{ sourceDatasetHeaders(header) }}
-        </span>
-        </td>
-      </tr>
-      <tr v-for="(row, index) in paginatedDataset" :key="index">
-        <td v-for="(value, key) in row" :key="key" v-html="highlightMatch(value, searchInput)">
-        </td>
-      </tr>
-    </table>
-  </div>
-    <div style="text-align: center; padding-top: 10px;">
-      <div class="pagination">
-        <a v-for="page in totalPages" :key="page" @click="goToPage(page)" :class="{ active: currentPage === page }">
-          {{ page }}
-        </a>
+  <div class="advanced-table">
+    <div class="table-controls">
+      <div class="search-container">
+        <Icon name="uil:search" class="search-icon"/>
+        <input
+            type="text"
+            placeholder="Rechercher..."
+            class="search-input"
+            v-model="searchInput"
+        />
+      </div>
+      <div class="limit-selector">
+        <span>Lignes par page:</span>
+        <select v-model="selectedLimit" @change="currentPage = 1">
+          <option v-for="option in limitOptions" :key="option" :value="option">{{ option }}</option>
+        </select>
       </div>
     </div>
-    <div style="text-align: end;">
-      <span>Page size:</span>
-      <select v-model="selectedLimit" @change="currentPage = 1">
-        <option v-for="option in limitOptions" :key="option" :value="option">{{ option }}</option>
-      </select>
+
+    <div class="table-wrapper">
+      <Loader v-if="loading" class="center-loader"/>
+      <div v-else-if="isEmpty" class="empty-state">
+        <Icon name="mdi:table-off" class="empty-icon"/>
+        <p>Aucune donnée disponible</p>
+      </div>
+      <div v-else class="table-container">
+        <table>
+          <thead>
+          <tr>
+            <th v-for="(header, index) in Object.keys(sourceDataset[0])" :key="index">
+              <div @click="sort(header)" class="sortable">
+                <span>{{ sourceDatasetHeaders(header) }}</span>
+                <Icon :name="sortIcon(header)" class="sort-icon" :class="{ active: sortByKey === header }"/>
+              </div>
+            </th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="(row, index) in paginatedDataset" :key="index">
+            <td v-for="(value, key) in row" :key="key" v-html="highlightMatch(value, searchInput)">
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+
+    <div v-if="!loading && !isEmpty" class="pagination-container">
+      <div class="pagination">
+        <button
+            v-if="currentPage > 1"
+            @click="goToPage(1)"
+            class="pagination-button"
+            title="Première page"
+        >
+          <Icon name="mdi:page-first"/>
+        </button>
+
+        <button
+            v-if="currentPage > 1"
+            @click="goToPage(currentPage - 1)"
+            class="pagination-button"
+            title="Page précédente"
+        >
+          <Icon name="mdi:chevron-left"/>
+        </button>
+
+        <button
+            v-if="showFirstPageButton"
+            @click="goToPage(1)"
+            class="pagination-button"
+        >
+          1
+        </button>
+
+        <span v-if="showFirstPageButton && visiblePages[0] > 2" class="pagination-ellipsis">...</span>
+
+        <button
+            v-for="page in visiblePages"
+            :key="page"
+            @click="goToPage(page)"
+            class="pagination-button"
+            :class="{ active: currentPage === page }"
+        >
+          {{ page }}
+        </button>
+
+        <span v-if="showLastPageButton && visiblePages[visiblePages.length - 1] < totalPages - 1"
+              class="pagination-ellipsis">...</span>
+
+        <button
+            v-if="showLastPageButton"
+            @click="goToPage(totalPages)"
+            class="pagination-button"
+        >
+          {{ totalPages }}
+        </button>
+
+        <button
+            v-if="currentPage < totalPages"
+            @click="goToPage(currentPage + 1)"
+            class="pagination-button"
+            title="Page suivante"
+        >
+          <Icon name="mdi:chevron-right"/>
+        </button>
+
+        <button
+            v-if="currentPage < totalPages"
+            @click="goToPage(totalPages)"
+            class="pagination-button"
+            title="Dernière page"
+        >
+          <Icon name="mdi:page-last"/>
+        </button>
+      </div>
+
+      <div class="pagination-info">
+        Page {{ currentPage }} sur {{ totalPages }}
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
-.pagination {
-  display: inline-block;
+.advanced-table {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  font-family: 'Inter', sans-serif;
 }
 
-.pagination a {
-  color: black;
-  float: left;
-  padding: 8px 16px;
-  text-decoration: none;
-  border: 1px solid #ddd; /* Gray */
+.table-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
 }
 
-.pagination a.active {
-  background-color: #da5574;
-  color: white;
+.search-container {
+  position: relative;
+  flex: 1;
 }
 
-.pagination a:hover:not(.active) {
-  background-color: #ddd;
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 18px;
 }
 
 .search-input {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 20px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+  padding: 10px 10px 10px 40px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background-color: #f9f9f9;
 }
 
-.sortable {
-  cursor: pointer;
+.search-input:focus {
+  outline: none;
+  border-color: #B7999C;
+  box-shadow: 0 0 0 2px rgba(183, 153, 156, 0.2);
+  background-color: white;
+}
+
+.limit-selector {
   display: flex;
   align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
 }
 
-.sortable:hover {
-  color: #EB5160FF;
+.limit-selector select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background-color: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
 }
 
-table {
-  border-collapse: collapse;
-  width: 100%;
-  overflow: hidden;
+.limit-selector select:focus {
+  outline: none;
+  border-color: #B7999C;
+  box-shadow: 0 0 0 2px rgba(183, 153, 156, 0.2);
 }
 
-tr {
-  text-align: left;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.34);
+.table-wrapper {
+  position: relative;
+  min-height: 200px;
 }
 
-td {
-  padding: 8px;
+.center-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #666;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px dashed #e0e0e0;
 }
 
-td:hover {
-  background-color: #f1f1f1;
-}
-
-tr:last-child {
-  border: none;
-}
-
-.font-bold {
-  font-weight: bold;
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  color: #B7999C;
 }
 
 .table-container {
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   max-height: 55vh;
-  overflow: auto;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  overflow-y: auto;
 }
 
-.center {
-  top: 50%;
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: #f5f5f5;
+}
+
+th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #e0e0e0;
+  white-space: nowrap;
+}
+
+td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #444;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.sortable {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s ease;
+}
+
+.sortable:hover {
+  color: #EB5160;
+}
+
+.sort-icon {
+  font-size: 16px;
+  opacity: 0.5;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.sort-icon.active {
+  opacity: 1;
+  color: #EB5160;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pagination-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  background-color: white;
+  color: #444;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-button:hover {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+}
+
+.pagination-button.active {
+  background-color: #EB5160;
+  border-color: #EB5160;
+  color: white;
+  font-weight: 600;
+}
+
+.pagination-ellipsis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: #666;
+}
+
+.pagination-info {
+  font-size: 14px;
+  color: #666;
+}
+
+mark {
+  background-color: rgba(235, 81, 96, 0.2);
+  color: #EB5160;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+@media (max-width: 768px) {
+  .table-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .pagination-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pagination {
+    justify-content: center;
+  }
+
+  .pagination-info {
+    text-align: center;
+  }
 }
 </style>
