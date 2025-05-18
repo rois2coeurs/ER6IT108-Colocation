@@ -134,16 +134,42 @@ export default {
         }
     },
     '/house-share/:id/purchases': {
-    GET: async (req: BunRequest<"/house-share/:id/purchases">) => {
-        const currentUserId = AuthHelper.checkAuth(req);
-        const searchParams = new URLSearchParams(new URL(req.url).search);
-        const {id} = req.params;
-        const membership = await checkMembership(Number(currentUserId), Number(id));
-        if (!membership || !await isAdmin(currentUserId)) throw new UnauthorizedError("You are not authorized to view this user's purchases");
-        const limit = castToNumber(searchParams.get('limit'));
-        const offset = castToNumber(searchParams.get('offset'));
-        const purchases = await getPurchases(Number(id), limit, offset);
-        return Response.json(purchases);
+        GET: async (req: BunRequest<"/house-share/:id/purchases">) => {
+            const currentUserId = AuthHelper.checkAuth(req);
+            const searchParams = new URLSearchParams(new URL(req.url).search);
+            const {id} = req.params;
+            const membership = await checkMembership(Number(currentUserId), Number(id));
+            if (!membership || !await isAdmin(currentUserId)) throw new UnauthorizedError("You are not authorized to view this user's purchases");
+            const limit = castToNumber(searchParams.get('limit'));
+            const offset = castToNumber(searchParams.get('offset'));
+            const purchases = await getPurchases(Number(id), limit, offset);
+            return Response.json(purchases);
+        }
+    },
+    '/house-share/:id/invites': {
+        GET: async (req: BunRequest<"/house-share/:id/invites">) => {
+            const userId = AuthHelper.checkAuth(req);
+            const {id} = req.params;
+            if (!await isMember(userId, Number(id))) throw new SafeDisplayError("You are not a member of this house-share", 400);
+            const house = await getHouseShare(Number(id));
+            if (!house[0]) throw new SafeDisplayError("house-share not found!", 404);
+            const invites = await getHouseShareInvites(Number(id));
+            return Response.json(invites);
+        },
+        POST: async (req: BunRequest<"/house-share/:id/invites">) => {
+            const userId = AuthHelper.checkAuth(req);
+            const {id} = req.params;
+            const house = await getHouseShare(Number(id));
+            if (!house[0]) throw new SafeDisplayError("house-share not found!", 404);
+            if (house[0].manager_id !== userId) throw new UnauthorizedError("Only the manager can create invites");
+            const {email} = await req.json();
+            if (!email) throw new SafeDisplayError("Missing email field", 400);
+            const user = await getUserByEmail(email);
+            if (!user[0]) throw new SafeDisplayError("User not found", 404);
+            if (await existsPendingInvite(user[0].id, Number(id))) throw new SafeDisplayError("User already has a pending invite", 400);
+            if (await isMember(user[0].id, Number(id))) throw new SafeDisplayError("User is already a member of this house-share", 400);
+            await createHouseShareInvite(Number(id), user[0].id);
+            return Response.json({message: "Invite created successfully"});
         }
     }
 }
@@ -163,7 +189,7 @@ async function getAllHouseShares() {
 async function getHouseShare(id: number) {
     return sql`SELECT house_share.*, shared_fund.id as shared_fund_id
                FROM house_share
-               LEFT JOIN shared_fund ON house_share.id = shared_fund.house_share_id
+                        LEFT JOIN shared_fund ON house_share.id = shared_fund.house_share_id
                WHERE house_share.id = ${id};`;
 }
 
@@ -281,11 +307,15 @@ async function isMember(userId: number, houseId: number) {
 }
 
 async function getHouseSharePurchases(id: number) {
-    return sql`SELECT purchases.id, purchases.title, purchases.amount, purchases.date, 
-                      users.firstname, users.name
+    return sql`SELECT purchases.id,
+                      purchases.title,
+                      purchases.amount,
+                      purchases.date,
+                      users.firstname,
+                      users.name
                FROM purchases
-               INNER JOIN users ON purchases.user_id = users.id
-               INNER JOIN shared_fund ON purchases.shared_fund_id = shared_fund.id
+                        INNER JOIN users ON purchases.user_id = users.id
+                        INNER JOIN shared_fund ON purchases.shared_fund_id = shared_fund.id
                WHERE shared_fund.house_share_id = ${id}
                ORDER BY purchases.date DESC;`;
 }
@@ -304,11 +334,39 @@ async function getPurchases(houseShareId: number | null, limit: number | null, o
                                          LEFT JOIN users ON purchases.user_id = users.id
                                 WHERE purchases.house_share_id = ${houseShareId}
                                 ORDER BY purchases.date DESC, purchases.id DESC
-                                LIMIT ${limit} OFFSET ${offset} `;
+                                LIMIT
+                                ${limit}
+                                OFFSET ${offset} `;
     const totalCount = await sql`SELECT COUNT(0) AS total_count
-                                 FROM purchases WHERE house_share_id = ${houseShareId}`;
+                                 FROM purchases
+                                 WHERE house_share_id = ${houseShareId}`;
     return {
         purchases,
         total: totalCount[0]?.total_count ?? 0
     };
+}
+
+async function getHouseShareInvites(id: number) {
+    return sql`SELECT invites.id, invites.date, invites.date,invites.status, users.name, users.firstname, users.mail
+               FROM invites
+                        JOIN users ON invites.user_id = users.id
+               WHERE house_share_id = ${id};`;
+}
+
+async function createHouseShareInvite(houseShareId: number, userId: number) {
+    return sql`INSERT INTO invites (house_share_id, user_id)
+               VALUES (
+    ${houseShareId},
+    ${userId}
+    );`;
+}
+
+async function existsPendingInvite(userId: number, houseShareId: number) {
+    const result = await sql`SELECT 1
+                             FROM invites
+                             WHERE user_id = ${userId}
+                               AND house_share_id = ${houseShareId}
+                               AND status = 'pending'
+                             LIMIT 1;`;
+    return result.count > 0;
 }

@@ -53,8 +53,8 @@ function displayMemberContact(member: Member) {
   alert(contactInfo);
 }
 
-async function switchMemberDisplayMode() {
-  memberDisplayAll.value = !memberDisplayAll.value;
+async function switchMemberDisplayMode(displayAll: boolean = false) {
+  memberDisplayAll.value = displayAll;
   await loadMembers(!memberDisplayAll.value);
 }
 
@@ -94,6 +94,7 @@ async function leaveHouseShare() {
 async function loadPurchases() {
   purchases.value = await loadData(5, 0);
 }
+
 async function loadData(limit: number, offset: number) {
   const res = await $apiClient.get(`/house-share/${route.params.id}/purchases?offset=${offset}&limit=${limit}`);
   const data = await res.json();
@@ -103,6 +104,7 @@ async function loadData(limit: number, offset: number) {
 await loadPurchases();
 
 const isModalOpen = ref(false);
+
 function getHeaderTitle(key: string) {
   switch (key) {
     case 'title':
@@ -139,6 +141,81 @@ async function createSharedFund() {
   window.location.href = `/shared_fund/${data.id}`;
 }
 
+const currentTab = ref<'actuels' | 'anciens' | 'invitations'>('actuels');
+
+const invites = ref<Invite[]>([]);
+
+async function loadInvites() {
+  const res = await $apiClient.get(`/house-share/${route.params.id}/invites`);
+  invites.value = await res.json();
+}
+
+await loadInvites();
+
+function convertDateToRelativeString(date: string) {
+  const now = new Date();
+  const dateObj = new Date(date);
+  const diffInMs = now.getTime() - dateObj.getTime();
+  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+  if (diffInDays === 0) {
+    return "Aujourd'hui";
+  } else if (diffInDays === 1) {
+    return "Hier";
+  } else if (diffInDays < 30) {
+    return `${diffInDays} jours`;
+  } else if (diffInDays < 365) {
+    return `${Math.floor(diffInDays / 30)} mois`;
+  } else {
+    return `${Math.floor(diffInDays / 365)} ans`;
+  }
+}
+
+async function cancelInvite(inviteId: number) {
+  if (!confirm("Êtes-vous sûr de vouloir annuler cette invitation ?")) return;
+  const res = await $apiClient.put(`/invites/${inviteId}`, {
+    status: 'cancelled'
+  });
+  const data = await res.json();
+  if (!res.ok && data.error) {
+    alert(data.error);
+    return;
+  }
+  await loadInvites();
+}
+
+function inviteStatusToFrench(status: string) {
+  switch (status) {
+    case 'pending':
+      return 'En attente';
+    case 'accepted':
+      return 'Acceptée';
+    case 'cancelled':
+      return 'Annulée';
+    case 'declined':
+      return 'Rejetée';
+    default:
+      return status;
+  }
+}
+
+const InviteModal = ref(false);
+
+async function sendInvite(email: string) {
+  if (!email) {
+    alert("Veuillez entrer un email valide.");
+    return;
+  }
+  const res = await $apiClient.post(`/house-share/${route.params.id}/invites`, {
+    email
+  });
+  const data = await res.json();
+  if (!res.ok && data.error) {
+    alert(data.error);
+    return;
+  }
+  InviteModal.value = false;
+  await loadInvites();
+}
 </script>
 
 <template>
@@ -157,10 +234,19 @@ async function createSharedFund() {
     <Card
         title="Membres"
         icon="mdi:human-queue"
-        :on-button-click="switchMemberDisplayMode"
-        :button-text="memberButtonTitle"
+        :display-button="false"
     >
-      <table>
+      <div class="tabs">
+        <button :class="{'active': currentTab === 'actuels'}"
+                @click="currentTab = 'actuels'; switchMemberDisplayMode(false)">Membres actuels
+        </button>
+        <button :class="{'active': currentTab === 'anciens'}"
+                @click="currentTab = 'anciens'; switchMemberDisplayMode(true)">Anciens Membres
+        </button>
+        <button :class="{'active': currentTab === 'invitations'}" @click="currentTab = 'invitations'">Invitations
+        </button>
+      </div>
+      <table v-if="(currentTab== 'actuels' || currentTab == 'anciens') && members.length > 0">
         <tr v-for="(member, index) in members" :key="index" class="member-item">
           <td>
             <Icon v-if="member.id === houseShare?.manager_id" name="mdi:crown" style="color: orange;"/>
@@ -190,6 +276,35 @@ async function createSharedFund() {
           </td>
         </tr>
       </table>
+      <div v-else-if="currentTab == 'actuels' || currentTab == 'anciens'">
+        <p>Aucun membre trouvé.</p>
+      </div>
+      <table v-if="currentTab== 'invitations' && invites.length > 0">
+        <tr v-for="(invite, index) in invites" :key="index" class="member-item">
+          <td>
+            {{ invite.firstname }}
+          </td>
+          <td>{{ invite.name }}</td>
+          <td :class="'invite-status-'+invite.status">
+            {{ inviteStatusToFrench(invite.status) }}
+          </td>
+          <td>
+            {{ convertDateToRelativeString(new Date(invite.date)) }}
+          </td>
+          <td v-if="isUserManager" class="action-buttons">
+            <button class="contact-button" @click="displayMemberContact(invite)" title="Contacter">
+              <Icon name="material-symbols:contact-page"/>
+            </button>
+            <button class="kick-button" @click="cancelInvite(invite.id)" title="Annuler l'invitation"
+                    v-if="invite.status === 'pending'">
+              <Icon name="material-symbols:person-remove"/>
+            </button>
+          </td>
+        </tr>
+      </table>
+      <div v-else-if="currentTab == 'invitations'">
+        <p>Aucune invitation trouvée.</p>
+      </div>
     </Card>
     <Card title="Achats pour la colocation" icon="mdi:history" :display-button="false" fullscreen-button
           :fullscreen-click="() => isModalOpen = true">
@@ -206,7 +321,13 @@ async function createSharedFund() {
       </Modal>
     </Card>
     <Card title="Actions" icon="mdi:application" :display-button="false">
-      <button @click="redirectToSharedFund(houseShare?.shared_fund_id.toString())" class="sharedFund-button" v-if="houseShare?.shared_fund_id">
+      <button @click="InviteModal = true" class="sharedFund-button" v-if="isUserManager">
+        <Icon name="material-symbols:add-2"/>
+        Inviter un nouvel utilisateur
+      </button>
+      <div style="height: 20px;"/>
+      <button @click="redirectToSharedFund(houseShare?.shared_fund_id.toString())" class="sharedFund-button"
+              v-if="houseShare?.shared_fund_id">
         <Icon name="icon-park-outline:funds"/>
         Voir la cagnotte
       </button>
@@ -218,10 +339,54 @@ async function createSharedFund() {
       <Button button-text="Quitter la colocation" icon="pepicons-pop:leave"
               :on-button-click="leaveHouseShare"></Button>
     </Card>
+    <HouseShareInviteModal v-model="InviteModal" @send-invitation="sendInvite"></HouseShareInviteModal>
   </NuxtLayout>
 </template>
 
 <style scoped>
+.invite-status-pending {
+  color: orange;
+}
+
+.invite-status-accepted {
+  color: #128d2b;
+}
+
+.invite-status-cancelled {
+  color: #EB5160FF;
+}
+
+.invite-status-declined {
+  color: #EB5160FF;
+}
+
+.tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.tabs button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: #eee;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+.tabs button.active {
+  background-color: #ccc;
+  font-weight: bold;
+}
+
+.member-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
 
 .action-buttons {
   display: flex;
