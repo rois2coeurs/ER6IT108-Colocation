@@ -1,5 +1,7 @@
 <script setup lang="ts">
 const {$apiClient} = useNuxtApp();
+import { eventBus } from '~/utils/event-bus';
+
 const users = ref<Array<any>>([]);
 const houseShares = ref<Array<any>>([]);
 const sharedFunds = ref<Array<any>>([]);
@@ -7,22 +9,70 @@ const purchases = ref<Array<any>>([]);
 const transfers = ref<Array<any>>([]);
 const isAdminColoc = ref(false);
 const selectedHouseShare = ref<any>(null);
+const selectedHouseShareName = ref<string>("");
 const isModalOpenUsers = ref(false);
 const isModalOpenHouseShares = ref(false);
 const isModalOpenSharedFunds = ref(false);
 const isModalOpenPurchases = ref(false);
 const isModalOpenTransfers = ref(false);
+const displayCount = 10;
+const route = useRoute();
 
-// Nombre d'entrées à afficher dans les listes
-const displayCount = 3;
-
-// Check if user is admin
-onMounted(() => {
+// Check if user is admin and load initial state
+async function checkAdminStatus() {
   const userData = JSON.parse(localStorage.getItem('user') || '{}');
   if (!userData.is_admin) {
     window.location.href = '/';
+    return;
   }
+  
+  // Vérifier si on est en mode admin coloc
+  const adminColocId = localStorage.getItem('admin_coloc_id');
+  if (adminColocId) {
+    isAdminColoc.value = true;
+    
+    // Charger les informations de la colocation pour afficher le nom
+    try {
+      const res = await $apiClient.get(`/house-share/${adminColocId}`);
+      if (res.ok) {
+        const houseShare = await res.json();
+        selectedHouseShare.value = houseShare;
+        selectedHouseShareName.value = houseShare.name;
+      }
+    } catch (error) {
+      console.error("Erreur lors du chargement des infos de colocation:", error);
+    }
+  } else {
+    isAdminColoc.value = false;
+    selectedHouseShare.value = null;
+    selectedHouseShareName.value = "";
+  }
+}
+
+onMounted(async () => {
+  await checkAdminStatus();
+  
+  // Charger les données initiales
+  loadUsers();
+  loadHouseShares();
+  loadSharedFunds();
+  loadPurchases();
+  loadTransfers();
 });
+
+// Surveiller les changements du mode admin coloc
+watch(() => localStorage.getItem('admin_coloc_id'), async (newValue) => {
+  await checkAdminStatus();
+  
+  // Si nous venons de quitter le mode admin coloc, recharger les données
+  if (!newValue) {
+    loadUsers();
+    loadHouseShares();
+    loadSharedFunds();
+    loadPurchases();
+    loadTransfers();
+  }
+}, { immediate: true });
 
 // Load all data
 loadUsers();
@@ -190,29 +240,43 @@ function getHeaderTitleTransfers(key: string) {
 }
 
 async function enterAdminColocMode(houseShare: any) {
+  // Enregistrer les informations de la colocation
   selectedHouseShare.value = houseShare;
-  isAdminColoc.value = true;
-  // Save real user to localStorage to restore after exit
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  localStorage.setItem('admin_real_user', JSON.stringify(user));
-  // Get manager information and set as current user
-  const res = await $apiClient.get(`/admin/house-share/${houseShare.id}/manager`);
-  const manager = await res.json();
-  localStorage.setItem('user', JSON.stringify(manager));
+  selectedHouseShareName.value = houseShare.name;
+  
+  // Stocker l'ID de la colocation pour la navigation
+  localStorage.setItem('admin_coloc_id', houseShare.id.toString());
+  
+  // Émettre un événement pour informer la navbar
+  eventBus.emit('admin-coloc-mode-changed', true);
+  
+  // Rediriger vers la page de colocation
+  navigateTo(`/house_share/${houseShare.id}`);
 }
 
 function exitAdminColocMode() {
+  // Supprimer le mode admin coloc
+  localStorage.removeItem('admin_coloc_id');
+  
+  // Mise à jour manuelle des états
   isAdminColoc.value = false;
   selectedHouseShare.value = null;
-  // Restore real user
-  const user = JSON.parse(localStorage.getItem('admin_real_user') || '{}');
-  localStorage.setItem('user', JSON.stringify(user));
-  localStorage.removeItem('admin_real_user');
+  selectedHouseShareName.value = "";
+  
+  // Émettre un événement pour informer la navbar
+  eventBus.emit('admin-coloc-mode-changed', false);
+  
+  // Force refresh des données
+  loadUsers();
+  loadHouseShares();
+  loadSharedFunds();
+  loadPurchases();
+  loadTransfers();
 }
 </script>
 
 <template>
-  <NuxtLayout :title="isAdminColoc ? 'Mode Admin Coloc: ' + selectedHouseShare?.name : 'Administration'">
+  <NuxtLayout :title="isAdminColoc ? 'Mode Admin Coloc: ' + selectedHouseShareName : 'Administration'">
     <div v-if="isAdminColoc" class="admin-coloc-mode">
       <Card title="Actions Admin" icon="mdi:application" :display-button="false">
         <Button button-text="Quitter le mode Admin Coloc" :on-button-click="exitAdminColocMode" />

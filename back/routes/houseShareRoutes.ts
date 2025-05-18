@@ -271,12 +271,17 @@ async function updateHouseShareMember(userId: number, id: number) {
 }
 
 async function isMember(userId: number, houseId: number) {
+    // Vérifier d'abord si l'utilisateur est un admin
+    const isUserAdmin = await isAdmin(userId);
+    if (isUserAdmin) return true;
+    
+    // Sinon, vérifier s'il est membre
     const membership = await sql`SELECT id
-                                 FROM stays
-                                 WHERE user_id = ${userId}
-                                   AND house_share_id = ${houseId}
-                                   AND exit_date IS NULL
-                                 LIMIT 1;`;
+                               FROM stays
+                               WHERE user_id = ${userId}
+                                 AND house_share_id = ${houseId}
+                                 AND exit_date IS NULL
+                               LIMIT 1;`;
     return membership[0] !== undefined;
 }
 

@@ -81,6 +81,24 @@ export default {
             
             return Response.json(manager);
         }
+    },
+    '/admin/authorize-access': {
+        POST: async (req: BunRequest<"/admin/authorize-access">) => {
+            const userId = AuthHelper.checkAuth(req);
+            if (!await isAdmin(userId)) throw new UnauthorizedError("Admin access required");
+            
+            const {resourceType, resourceId} = await req.json();
+            if (!resourceType || !resourceId) {
+                throw new SafeDisplayError("Missing resource information", 400);
+            }
+            
+            // Pour l'instant, on autorise uniquement l'accès aux house-share
+            if (resourceType === 'house-share') {
+                return Response.json({ authorized: true });
+            }
+            
+            return Response.json({ authorized: false });
+        }
     }
 }
 
