@@ -15,13 +15,22 @@ export default defineNuxtRouteMiddleware(async to => {
                 localStorage.removeItem('user');
                 return navigateTo('/login?redirect=' + to.path);
             }
+            
+            // Si l'utilisateur est un admin alors le redirige vers la page d'admin
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (user.is_admin && to.path !== '/admin' && !isAdminColocMode()) {
+                return navigateTo('/admin');
+            }
         } catch (e) {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             return navigateTo('/login?redirect=' + to.path);
         }
     }
+    
+    function isAdminColocMode() {
+        return localStorage.getItem('admin_real_user') !== null;
+    }
 
     await checkLogin();
-
 });
