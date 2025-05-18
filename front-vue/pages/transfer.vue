@@ -66,8 +66,8 @@ await loadTransfers();
       <template #default>
         <form ref="formRef">
           <FormErrorBox :errors="errors"/>
-          <FormInput name="recipientEmail" label="Destinataire"/>
-          <FormInput name="amount" label="Montant" input-type="number"/>
+          <FormInput name="recipientEmail" label="Destinataire" placeholder="john.smith@gmail.com"/>
+          <FormInput name="amount" label="Montant (€)" input-type="number" placeholder="5"/>
         </form>
       </template>
     </Card>

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'auth'
+});
 const errors = ref<string[]>([]);
 const registerForm = ref<HTMLFormElement | null>(null);
 

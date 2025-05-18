@@ -1,4 +1,7 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'auth',
+});
 const errors = ref<string[]>([]);
 await checkToken();
 const urlParams = new URLSearchParams(window.location.search);
