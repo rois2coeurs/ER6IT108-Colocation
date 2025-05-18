@@ -161,9 +161,10 @@ async function getAllHouseShares() {
 }
 
 async function getHouseShare(id: number) {
-    return sql`SELECT *
+    return sql`SELECT house_share.*, shared_fund.id as shared_fund_id
                FROM house_share
-               WHERE id = ${id};`;
+               LEFT JOIN shared_fund ON house_share.id = shared_fund.house_share_id
+               WHERE house_share.id = ${id};`;
 }
 
 async function newHouseShare(name: string, address: string, userId: number) {

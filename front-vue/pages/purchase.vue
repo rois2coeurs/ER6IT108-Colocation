@@ -10,6 +10,22 @@ const historyButtonText = computed(() => {
 const isModalOpen = ref(false);
 loadPurchases();
 
+const houseShareId = ref<number | null>(null);
+const sharedFundId = ref<number | null>(null);
+await loadIds();
+
+async function loadIds() {
+  const res = await $apiClient.get(`/me`);
+  if (!res) return;
+  const resData = await res.json();
+  if (!res.ok) {
+    alert(resData.error);
+    return;
+  }
+  houseShareId.value = resData?.houseShareId;
+  sharedFundId.value = resData?.sharedFundId;
+}
+
 async function loadPurchases() {
   const res = await $apiClient.get(`/purchase?userId=${getUserId()}&offset=${offset}&limit=${limit}`);
   const data = await res.json();
@@ -79,9 +95,9 @@ const form = ref<HTMLFormElement | null>(null);
           button-text="Déclarer un nouvel achat" :on-button-click="postPurchase">
       <form ref="form">
         <FormErrorBox :errors="errors"/>
-        <FormInput input-type="text" name="title" label="Nom de l'achat"/>
-        <FormInput input-type="number" name="amount" label="Montant"/>
-        <FormInput input-type="checkbox" name="useShareFund" label="Utiliser la cagnotte"/>
+        <FormInput input-type="text" name="title" label="Nom de l'achat" placeholder="2kg de pâtes"/>
+        <FormInput input-type="number" name="amount" label="Montant (€)" placeholder="2"/>
+        <FormInput input-type="checkbox" name="useShareFund" label="Utiliser la cagnotte" v-if="sharedFundId"/>
         <FormInput input-type="date" name="date" label="Date de l'achat"/>
       </form>
     </Card>

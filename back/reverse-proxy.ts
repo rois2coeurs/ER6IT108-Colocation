@@ -28,22 +28,14 @@ const serve = Bun.serve({
             setCorsHeaders(res);
             return res;
         }
-        if (url.pathname.startsWith('/front/')) {
-            const file = Bun.file("../" + url.pathname);
-            if (!await file.exists()) return new Response('File not found', {status: 404});
-            console.log(url + " ==> " + "../" + url.pathname);
-            return new Response(file);
-        } else {
-            const redirectUrl = new URL(req.url);
-            redirectUrl.hostname = "localhost";
-            redirectUrl.port = "3000";
-            redirectUrl.protocol = "http";
-            console.log(url + " ==> " + redirectUrl);
-            const res = await fetch(redirectUrl, req);
-            const response = new Response(res.body, {status: res.status, statusText: res.statusText});
-            setCorsHeaders(response);
-            return response;
-        }
+        const redirectUrl = new URL(req.url);
+        redirectUrl.hostname = "localhost";
+        redirectUrl.port = "3000";
+        redirectUrl.protocol = "http";
+        console.log(url + " ==> " + redirectUrl);
+        const res = await fetch(redirectUrl, req);
+        setCorsHeaders(res);
+        return res;
     }
 });
 

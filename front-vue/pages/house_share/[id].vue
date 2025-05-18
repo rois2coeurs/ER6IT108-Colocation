@@ -122,6 +122,23 @@ function getHeaderTitle(key: string) {
   }
 }
 
+function redirectToSharedFund(id: string) {
+  window.location.href = `/shared_fund/${id}`;
+}
+
+async function createSharedFund() {
+  if (!confirm("Êtes-vous sûr de vouloir créer une cagnotte ?")) return;
+  const res = await $apiClient.post(`/shared-fund`, {
+    houseShareId: houseShare.value?.id
+  });
+  const data = await res.json();
+  if (!res.ok && data.error) {
+    alert(data.error);
+    return;
+  }
+  window.location.href = `/shared_fund/${data.id}`;
+}
+
 </script>
 
 <template>
@@ -174,7 +191,7 @@ function getHeaderTitle(key: string) {
         </tr>
       </table>
     </Card>
-    <Card title="Achats (ordre décroissant)" icon="mdi:history" :display-button="false" fullscreen-button
+    <Card title="Achats pour la colocation" icon="mdi:history" :display-button="false" fullscreen-button
           :fullscreen-click="() => isModalOpen = true">
       <table v-if="purchases.length > 0">
         <tr v-for="(purchase, index) in purchases" :key="index" class="member-item">
@@ -189,7 +206,11 @@ function getHeaderTitle(key: string) {
       </Modal>
     </Card>
     <Card title="Actions" icon="mdi:application" :display-button="false">
-      <button @click="leaveHouseShare" class="sharedFund-button">
+      <button @click="redirectToSharedFund(houseShare?.shared_fund_id.toString())" class="sharedFund-button" v-if="houseShare?.shared_fund_id">
+        <Icon name="icon-park-outline:funds"/>
+        Voir la cagnotte
+      </button>
+      <button @click="createSharedFund" class="sharedFund-button" v-else>
         <Icon name="icon-park-outline:funds"/>
         Crée une cagnotte
       </button>

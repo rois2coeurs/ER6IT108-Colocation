@@ -109,7 +109,7 @@ await loadContributions(5);
         <template #default>
             <form ref="contributionForm">
                 <FormErrorBox :errors="errors"/>
-                <FormInput name="amount" label="Montant" input-type="number"/>
+                <FormInput name="amount" label="Montant (€)" input-type="number" placeholder="5"/>
             </form>
         </template>
         </Card>
@@ -122,7 +122,6 @@ await loadContributions(5);
             fullscreen-button
             :fullscreen-click="() => isModalOpen = true"
         >
-            <template #default>
                 <table v-if="contributions && contributions.length > 0">
                     <tr v-for="(contribution, index) in contributions" :key="index" class="contribution-item">
                     <td>{{ contribution.firstname }}</td>
@@ -134,7 +133,6 @@ await loadContributions(5);
                 <p v-else class="center">
                     <span class="bubble">Aucun versement effectué</span>
                 </p>
-            </template>
         </Card>
       
         <Modal v-model="isModalOpen" title="Historique des versements">
