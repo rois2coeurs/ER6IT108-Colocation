@@ -69,7 +69,7 @@ async function acceptInvite(inviteId: number) {
   const res = await $apiClient.put(`/invites/${inviteId}`, { status: 'accepted' });
   if (res.ok) {
     const resData = await res.json();
-    window.location.href = 'house_share/' + resData.houseSHareId;
+    window.location.href = 'house_share/' + resData.houseShareId;
   } else {
     alert("Erreur lors de l'acceptation de l'invitation");
   }
