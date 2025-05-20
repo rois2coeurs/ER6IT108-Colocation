@@ -17,14 +17,30 @@ export default {
         },
         POST: async (req: BunRequest<"/purchase">) => {
             const currentUserId = AuthHelper.checkAuth(req);
-            const {title, amount, date, useShareFund} = await req.json();
+            const {title, amount, date, useShareFund, targets} = await req.json();
             const amountNum = Number(amount);
             const dateObj = new Date(date);
-            if (isNaN(amountNum) || isNaN(dateObj.getTime())) {
-                throw new SafeDisplayError("Invalid amount or date format", 400);
+            if (isNaN(amountNum) || isNaN(dateObj.getTime())) throw new SafeDisplayError("Invalid amount or date format", 400);
+            if (!title || !amountNum || !dateObj) throw new SafeDisplayError("Missing required fields", 400);
+            if (amountNum <= 0) throw new SafeDisplayError("Amount must be greater than 0", 400);
+            if (useShareFund === "on") {
+                const sharedFundId = await getUseShareFund(currentUserId);
+                if (!sharedFundId) throw new SafeDisplayError("You don't have a shared fund", 400);
             }
-            await createPurchase(currentUserId, title, amountNum, dateObj, useShareFund === "on");
+            if (targets && targets.length > 0) {
+                const possibleTargets = await getPossibleTargets(currentUserId);
+                console.log(targets);
+                const invalidTargets = targets.filter((id: number) => !possibleTargets.some((target) => target.id === id));
+                if (invalidTargets.length > 0) throw new SafeDisplayError(`Invalid targets: ${invalidTargets.join(", ")}`, 400);
+            }
+            await createPurchase(currentUserId, title, amountNum, dateObj, useShareFund === "on", targets ?? []);
             return Response.json({success: true});
+        }
+    },
+    '/purchase/possible-targets': {
+        GET: async (req: BunRequest<"/purchase/possible-targets">) => {
+            const currentUserId = AuthHelper.checkAuth(req);
+            return Response.json(await getPossibleTargets(currentUserId));
         }
     }
 }
@@ -47,7 +63,17 @@ async function getPurchases(userId: number | null, limit: number | null, offset:
                                        purchases.date,
                                        purchases.shared_fund_id IS NOT NULL AS shared_fund_set,
                                        house_share.name                     AS house_share_name,
-                                       house_share.id                       AS house_share_id
+                                       house_share.id                       AS house_share_id,
+                                       (COALESCE(
+                                               NULLIF(
+                                                       (SELECT string_agg(u.firstname || ' ' || u.name, ', ')
+                                                        FROM purchases_targets
+                                                                 INNER JOIN public.users u ON u.id = purchases_targets.user_id
+                                                        WHERE purchase_id = purchases.id),
+                                                       ''
+                                               ),
+                                               'Toute la colocation'
+                                        ))                                  AS targets
                                 FROM purchases
                                          LEFT JOIN house_share ON purchases.house_share_id = house_share.id
                                     ${userIdCondition}
@@ -71,19 +97,31 @@ async function getUseShareFund(userId: number): Promise<number | null> {
     return sharedFund[0]?.id ?? null;
 }
 
-async function createPurchase(userId: number, title: string, amount: number, date: Date, useShareFund: boolean) {
+async function createPurchase(userId: number, title: string, amount: number, date: Date, useShareFund: boolean, targets: number[]) {
     if (!title || !amount || !date) throw new Error("Missing required fields");
     if (amount <= 0) throw new Error("Amount must be greater than 0");
     const houseShareId = await getUserHouseShareId(userId);
     if (!houseShareId) throw new Error("You don't have a house share");
+    let purchaseId: number | null = null;
     if (useShareFund) {
         const sharedFundId = await getUseShareFund(userId);
         if (!sharedFundId) throw new Error("You don't have a shared fund");
-        await sql`INSERT INTO purchases (user_id, title, amount, date, house_share_id, shared_fund_id)
-              VALUES (${userId}, ${title}, ${amount}, ${date.toISOString()}, ${houseShareId}, ${sharedFundId})`;
+        purchaseId = await sql`INSERT INTO purchases (user_id, title, amount, date, house_share_id, shared_fund_id)
+                               VALUES (${userId}, ${title}, ${amount}, ${date.toISOString()}, ${houseShareId},
+                                       ${sharedFundId})
+                               RETURNING id`;
     } else {
-        await sql`INSERT INTO purchases (user_id, title, amount, date, house_share_id)
-              VALUES (${userId}, ${title}, ${amount}, ${date.toISOString()}, ${houseShareId})`;
+        purchaseId = await sql`INSERT INTO purchases (user_id, title, amount, date, house_share_id)
+                               VALUES (${userId}, ${title}, ${amount}, ${date.toISOString()}, ${houseShareId})
+                               RETURNING id`;
+    }
+    purchaseId = purchaseId[0]?.id;
+    if (!purchaseId) throw new SafeDisplayError("Failed to create purchase", 500);
+    if (targets.length > 0) {
+        for (const target of targets) {
+            await sql`INSERT INTO purchases_targets (purchase_id, user_id)
+                      VALUES (${purchaseId}, ${target})`;
+        }
     }
 }
 
@@ -94,4 +132,16 @@ async function getUserHouseShareId(userId: number): Promise<number | null> {
                                  WHERE s.user_id = ${userId}
                                    AND s.exit_date IS NULL;`;
     return houseShare[0]?.id ?? null;
+}
+
+async function getPossibleTargets(userId: number): Promise<{ id: number, name: string }[]> {
+    const houseShare = await sql`SELECT users.id, users.firstname, users.name
+                                 FROM users
+                                          INNER JOIN public.stays s on users.id = s.user_id
+                                 WHERE exit_date IS NULL
+                                   AND house_share_id = (SELECT house_share_id
+                                                         FROM stays
+                                                         WHERE stays.exit_date IS NULL
+                                                           and stays.user_id = ${userId});`;
+    return houseShare;
 }

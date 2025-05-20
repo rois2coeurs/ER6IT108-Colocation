@@ -119,6 +119,8 @@ function getHeaderTitle(key: string) {
       return 'Nom de l\'achteur';
     case 'shared_fund_set':
       return 'Cagnotte';
+    case 'targets':
+      return 'Concerne';
     default:
       return key;
   }

@@ -329,7 +329,17 @@ async function getPurchases(houseShareId: number | null, limit: number | null, o
                                        purchases.date,
                                        purchases.shared_fund_id IS NOT NULL AS shared_fund_set,
                                        users.firstname,
-                                       users.name
+                                       users.name,
+                                       (COALESCE(
+                                               NULLIF(
+                                                       (SELECT string_agg(u.firstname || ' ' || u.name, ', ')
+                                                        FROM purchases_targets
+                                                                 INNER JOIN public.users u ON u.id = purchases_targets.user_id
+                                                        WHERE purchase_id = purchases.id),
+                                                       ''
+                                               ),
+                                               'Toute la colocation'
+                                        ))                                  AS targets
                                 FROM purchases
                                          LEFT JOIN users ON purchases.user_id = users.id
                                 WHERE purchases.house_share_id = ${houseShareId}
