@@ -58,6 +58,8 @@ function getHeaderTitle(key: string) {
       return 'id colocation';
     case 'shared_fund_set':
       return 'Cagnotte';
+    case 'targets':
+      return 'Concerne';
     default:
       return key;
   }
@@ -65,6 +67,7 @@ function getHeaderTitle(key: string) {
 
 async function postPurchase() {
   let data = getFormData(form);
+  data.targets = toRaw(selectedTargets.value).value;
   if (!data || !data.title || !data.amount || !data.date) {
     errors.value = ['Veuillez remplir tous les champs.'];
     return;
@@ -85,8 +88,28 @@ async function postPurchase() {
 }
 
 const errors = ref<string[]>([]);
+const possibleTargets = ref<object[]>([]);
 
+async function laodPossibleTargets() {
+  const res = await $apiClient.get(`/purchase/possible-targets?userId=${getUserId()}`);
+  if (!res.ok) {
+    const resData = await res.json();
+    alert(resData.error);
+    return;
+  }
+  possibleTargets.value = await res.json();
+  possibleTargets.value = possibleTargets.value.map((target: any) => {
+    return {
+      id: target.id,
+      name: target.firstname + ' ' + target.name,
+    }
+  });
+  console.log(possibleTargets.value);
+}
+
+laodPossibleTargets()
 const form = ref<HTMLFormElement | null>(null);
+const selectedTargets = ref<number[]>([]);
 </script>
 
 <template>
@@ -99,6 +122,9 @@ const form = ref<HTMLFormElement | null>(null);
         <FormInput input-type="number" name="amount" label="Montant (€)" placeholder="2"/>
         <FormInput input-type="checkbox" name="useShareFund" label="Utiliser la cagnotte" v-if="sharedFundId"/>
         <FormInput input-type="date" name="date" label="Date de l'achat"/>
+        <FormSelectBox name="Concerne" :options="possibleTargets" v-if="houseShareId" :multiple="true"
+                       @update:model-value="(value) => selectedTargets.value = value"
+                       empty-value="Toute la colocation"/>
       </form>
     </Card>
     <Card title="Historique de vos achats" icon="mdi:history" :button-text="historyButtonText"
