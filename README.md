@@ -11,8 +11,23 @@ https://coloc.valentinraillard.fr/
 # Install and run the web app
 
 ## Docker
-docker compose -profiles deploy
+### Deploy
+You need to have Docker and Docker Compose installed on your machine.
 
+You can modify the docker-compose.yml file to change the database name, user, and password or the backend url and all the ports.
+
+By default, the backend is on port 5000 and the frontend on port 3000. (http://localhost:3000)
+
+```bash
+docker-compose up -d
+```
+
+### Development
+There also is a docker-compose.dev.yml file for development.
+
+```bash
+docker-compose -f docker-compose.dev.yml up -d
+```
 
 # Technologies utilisées
 
