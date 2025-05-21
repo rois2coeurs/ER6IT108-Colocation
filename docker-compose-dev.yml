@@ -1,4 +1,4 @@
-name: "coloc"
+name: "coloc-dev"
 
 services:
   db:
@@ -11,11 +11,23 @@ services:
       POSTGRES_DB: database
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    profiles:
+      - database
     healthcheck: # This is used to check if the database is up and running before starting the backend
       test: [ "CMD-SHELL", "pg_isready", "-d", "database" ]
       interval: 30s
       timeout: 10s
       retries: 3
+
+  adminer:
+    profiles:
+      - dev
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
 
   frontend:
     build: ./front-vue
@@ -28,12 +40,14 @@ services:
   backend:
     build: ./back
     restart: always
+    environment:
+      - POSTGRES_URL=postgres://root:password@db:5432/database
     ports:
       - "5000:3000"
     depends_on:
       - db
-    environment:
-      - POSTGRES_URL=postgres://root:password@db:5432/database
+
+
 
 volumes:
   postgres_data:

@@ -2,7 +2,7 @@ import {type BunRequest, sql} from "bun";
 import {AuthHelper} from "../helpers/authHelper.ts";
 import {SafeDisplayError} from "../errors/SafeDisplayError.ts";
 import {UnauthorizedError} from "../errors/UnauthorizedError.ts";
-import {checkPhoneNumber, checkPassword} from "../utils.ts";
+import {checkPhoneNumber, checkPassword, CorsResponse} from "../utils.ts";
 
 export default {
     '/me': {
@@ -10,7 +10,7 @@ export default {
             const userId = AuthHelper.checkAuth(req);
             const ids = await getUserRelatedId(userId);
             if (!ids) return Response.json(null);
-            return Response.json({houseShareId: ids.house_share_id, sharedFundId: ids.shared_fund_id});
+            return CorsResponse.json({houseShareId: ids.house_share_id, sharedFundId: ids.shared_fund_id});
         }
     },
     '/users/:id': {
@@ -35,7 +35,7 @@ export default {
                 await updateUserWithoutPassword(Number(id), firstname, name, phone_number);
             }
 
-            return Response.json({message: "User updated successfully"});
+            return CorsResponse.json({message: "User updated successfully"});
         }
     }
 }

@@ -20,7 +20,7 @@ RUN bun run generate
 FROM nginx:stable-alpine
 WORKDIR /usr/share/nginx/html
 
+ENV NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
+COPY ./nginx.conf /etc/nginx/templates/nginx.conf.template
 # Only `.output` folder is needed from the build stage
 COPY --from=build /app/.output/public/ ./
-COPY ./nginx.conf /etc/nginx/nginx.conf
-COPY config-prod.json /usr/share/nginx/html/config.json

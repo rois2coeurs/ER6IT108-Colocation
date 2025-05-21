@@ -20,4 +20,26 @@ function checkPassword(password: string) {
     return !(!password.match(/[A-Z]/) && !password.match(/[0-9]/));
 }
 
-export {setBounds, castToNumber, checkPhoneNumber, checkPassword};
+const useCors = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+}
+
+class CorsResponse extends Response {
+    constructor(body: BodyInit | null = null, init?: ResponseInit) {
+        super(body, {...init, headers: {...useCors, ...init?.headers}});
+    }
+    static json(body: BodyInit | null = null, init?: ResponseInit) {
+        return new CorsResponse(JSON.stringify(body), {
+            ...init,
+            headers: {
+                "Content-Type": "application/json",
+                ...useCors,
+                ...init?.headers
+            }
+        });
+    }
+}
+
+export {setBounds, castToNumber, checkPhoneNumber, checkPassword, CorsResponse};

@@ -11,6 +11,7 @@ COPY package.json bun.lockb /temp/prod/
 RUN cd /temp/prod && bun install --frozen-lockfile --production
 
 FROM base AS release
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD curl -f http://localhost:3000/health || exit 1
 COPY --from=install /temp/prod/node_modules node_modules
 COPY . .
 RUN mkdir /usr/src/app/data

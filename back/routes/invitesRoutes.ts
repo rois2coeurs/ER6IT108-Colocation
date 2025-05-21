@@ -1,6 +1,7 @@
 import {type BunRequest, sql} from "bun";
 import {AuthHelper} from "../helpers/authHelper.ts";
 import {SafeDisplayError} from "../errors/SafeDisplayError.ts";
+import {CorsResponse} from "../utils.ts";
 
 export default {
     '/invites/:id': {
@@ -15,17 +16,17 @@ export default {
             if (status === "cancelled") {
                 if (!await canCancelInvite(Number(id), userId)) throw new SafeDisplayError("Only the manager can cancel an invite", 403);
                 await updateInviteStatus(Number(id), "cancelled");
-                return Response.json({message: "Invite cancelled",});
+                return CorsResponse.json({message: "Invite cancelled",});
             }
             if (status === "accepted") {
                 if (await isUserStayingSomewhere(userId)) throw new SafeDisplayError("You are already staying somewhere", 400);
                 await createNewStay(userId, invite.house_share_id);
                 await updateInviteStatus(Number(id), "accepted");
-                return Response.json({message: "Invite accepted", houseShareId: invite.house_share_id});
+                return CorsResponse.json({message: "Invite accepted", houseShareId: invite.house_share_id});
             }
             if (status === "declined") {
                 await updateInviteStatus(Number(id), "declined");
-                return Response.json({message: "Invite declined",});
+                return CorsResponse.json({message: "Invite declined",});
             }
         }
     },
