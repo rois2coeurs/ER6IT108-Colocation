@@ -8,7 +8,7 @@
 # Install and run the web app
 
 ## Docker
-docker compose -profile deploy
+docker compose -profiles deploy
 
 
 # Technologies utilisées
