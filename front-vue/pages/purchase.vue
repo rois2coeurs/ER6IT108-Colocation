@@ -90,7 +90,7 @@ async function postPurchase() {
 const errors = ref<string[]>([]);
 const possibleTargets = ref<object[]>([]);
 
-async function laodPossibleTargets() {
+async function loadPossibleTargets() {
   const res = await $apiClient.get(`/purchase/possible-targets?userId=${getUserId()}`);
   if (!res.ok) {
     const resData = await res.json();
@@ -107,7 +107,7 @@ async function laodPossibleTargets() {
   console.log(possibleTargets.value);
 }
 
-laodPossibleTargets()
+loadPossibleTargets()
 const form = ref<HTMLFormElement | null>(null);
 const selectedTargets = ref<number[]>([]);
 </script>

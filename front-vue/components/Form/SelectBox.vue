@@ -51,7 +51,12 @@ const open = ref(false);
 <template>
   <span>{{ name }}</span>
   <div style="width: 100%; position: relative;">
-    <div class="select-box" @click="open = !open">
+    <div class="select-box"
+         role="button"
+         tabindex="0"
+         @click="open = !open"
+         @keydown.enter="open = !open"
+         @keydown.space.prevent="open = !open">
     <span class="dropdown-arrow" v-if="!open" style="margin-right: 5px;">
       <Icon name="gridicons:chevron-down"></Icon>
     </span>

@@ -29,7 +29,6 @@ export default {
             }
             if (targets && targets.length > 0) {
                 const possibleTargets = await getPossibleTargets(currentUserId);
-                console.log(targets);
                 const invalidTargets = targets.filter((id: number) => !possibleTargets.some((target) => target.id === id));
                 if (invalidTargets.length > 0) throw new SafeDisplayError(`Invalid targets: ${invalidTargets.join(", ")}`, 400);
             }
@@ -102,25 +101,25 @@ async function createPurchase(userId: number, title: string, amount: number, dat
     if (amount <= 0) throw new Error("Amount must be greater than 0");
     const houseShareId = await getUserHouseShareId(userId);
     if (!houseShareId) throw new Error("You don't have a house share");
-    let purchaseId: number | null = null;
+    let insertResult: number | null = null;
     if (useShareFund) {
         const sharedFundId = await getUseShareFund(userId);
         if (!sharedFundId) throw new Error("You don't have a shared fund");
-        purchaseId = await sql`INSERT INTO purchases (user_id, title, amount, date, house_share_id, shared_fund_id)
+        insertResult  = await sql`INSERT INTO purchases (user_id, title, amount, date, house_share_id, shared_fund_id)
                                VALUES (${userId}, ${title}, ${amount}, ${date.toISOString()}, ${houseShareId},
                                        ${sharedFundId})
                                RETURNING id`;
     } else {
-        purchaseId = await sql`INSERT INTO purchases (user_id, title, amount, date, house_share_id)
+        insertResult  = await sql`INSERT INTO purchases (user_id, title, amount, date, house_share_id)
                                VALUES (${userId}, ${title}, ${amount}, ${date.toISOString()}, ${houseShareId})
                                RETURNING id`;
     }
-    purchaseId = purchaseId[0]?.id;
+    const purchaseId = insertResult[0]?.id;
     if (!purchaseId) throw new SafeDisplayError("Failed to create purchase", 500);
     if (targets.length > 0) {
         for (const target of targets) {
             await sql`INSERT INTO purchases_targets (purchase_id, user_id)
-                      VALUES (${purchaseId}, ${target})`;
+                      VALUES (${purchaseId }, ${target})`;
         }
     }
 }
