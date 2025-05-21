@@ -1,7 +1,7 @@
 import {type BunRequest, sql} from "bun";
 import {AuthHelper} from "../helpers/authHelper.ts";
 import {UnauthorizedError} from "../errors/UnauthorizedError.ts";
-import {castToNumber, setBounds} from "../utils.ts";
+import {castToNumber, CorsResponse, setBounds} from "../utils.ts";
 import {SafeDisplayError} from "../errors/SafeDisplayError.ts";
 
 export default {
@@ -13,7 +13,7 @@ export default {
             if (userId && (userId !== currentUserId || !await isAdmin(currentUserId))) throw new UnauthorizedError("You are not authorized to view this user's purchases");
             const limit = castToNumber(searchParams.get('limit'));
             const offset = castToNumber(searchParams.get('offset'));
-            return Response.json(await getPurchases(userId, 5, offset));
+            return CorsResponse.json(await getPurchases(userId, 5, offset));
         },
         POST: async (req: BunRequest<"/purchase">) => {
             const currentUserId = AuthHelper.checkAuth(req);
@@ -33,13 +33,13 @@ export default {
                 if (invalidTargets.length > 0) throw new SafeDisplayError(`Invalid targets: ${invalidTargets.join(", ")}`, 400);
             }
             await createPurchase(currentUserId, title, amountNum, dateObj, useShareFund === "on", targets ?? []);
-            return Response.json({success: true});
+            return CorsResponse.json({success: true});
         }
     },
     '/purchase/possible-targets': {
         GET: async (req: BunRequest<"/purchase/possible-targets">) => {
             const currentUserId = AuthHelper.checkAuth(req);
-            return Response.json(await getPossibleTargets(currentUserId));
+            return CorsResponse.json(await getPossibleTargets(currentUserId));
         }
     }
 }

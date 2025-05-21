@@ -2,14 +2,14 @@ import {type BunRequest, sql} from "bun";
 import {AuthHelper} from "../helpers/authHelper.ts";
 import {SafeDisplayError} from "../errors/SafeDisplayError.ts";
 import {UnauthorizedError} from "../errors/UnauthorizedError.ts";
-import {castToNumber, setBounds} from "../utils.ts";
+import {castToNumber, CorsResponse, setBounds} from "../utils.ts";
 
 export default {
     '/house-share': {
         GET: async (req: BunRequest<"/house-share">) => {
             AuthHelper.checkAuth(req);
             const houses = await getAllHouseShares();
-            return Response.json(houses);
+            return CorsResponse.json(houses);
         },
         POST: async (req: BunRequest<"/house-share">) => {
             const userId = AuthHelper.checkAuth(req);
@@ -20,7 +20,7 @@ export default {
             const res = await newHouseShare(name, address, userId);
             await addHouseShareMember(userId, res[0].id);
 
-            return Response.json(res[0], {status: 201});
+            return CorsResponse.json(res[0], {status: 201});
         }
     },
     '/house-share/:id': {
@@ -30,7 +30,7 @@ export default {
             if (!await isMember(userId, Number(id))) throw new SafeDisplayError("You are not a member of this house-share", 400);
             const house = await getHouseShare(Number(id));
             if (!house[0]) throw new SafeDisplayError("house-share not found!", 404);
-            return Response.json(house[0], {headers: {'Cache-Control': 'max-age=300'}});
+            return CorsResponse.json(house[0]);
         },
         DELETE: async (req: BunRequest<"/house-share/:id">) => {
             const userId = AuthHelper.checkAuth(req);
@@ -41,7 +41,7 @@ export default {
             if (house[0].manager_id !== userId) throw new UnauthorizedError();
             await deleteHouseShare(id);
 
-            return new Response("House-share deleted", {status: 200});
+            return new CorsResponse("House-share deleted", {status: 200});
         },
         PUT: async (req: BunRequest<"/house-share/:id">) => {
             const userId = AuthHelper.checkAuth(req);
@@ -56,7 +56,7 @@ export default {
 
             await updateHouseShare(name, address, Number(id));
 
-            return Response.json({message: "House-share updated"}, {status: 200});
+            return CorsResponse.json({message: "House-share updated"}, {status: 200});
         }
     },
     '/house-share/:id/members': {
@@ -66,7 +66,7 @@ export default {
             if (!await isMember(userId, Number(id))) throw new SafeDisplayError("You are not a member of this house-share", 400);
             const searchParams = new URLSearchParams(new URL(req.url).search);
             const members = await getHouseShareMembers(Number(id), searchParams.get("active") === "true");
-            return Response.json(members);
+            return CorsResponse.json(members);
         },
         POST: async (req: BunRequest<"/house-share/:id/members">) => {
             const userId = AuthHelper.checkAuth(req);
@@ -82,7 +82,7 @@ export default {
             if (!user[0]) throw new SafeDisplayError("User not found", 404);
             await addHouseShareMember(user[0].id, Number(id));
 
-            return Response.json({message: "User added to house-share"}, {status: 201});
+            return CorsResponse.json({message: "User added to house-share"}, {status: 201});
         },
         PUT: async (req: BunRequest<"/house-share/:id/members">) => {
             const userId = AuthHelper.checkAuth(req);
@@ -99,7 +99,7 @@ export default {
             }
             await updateHouseShareMember(userId, Number(id));
 
-            return Response.json({message: "Successfully left the house-share"}, {status: 200});
+            return CorsResponse.json({message: "Successfully left the house-share"}, {status: 200});
         }
     },
     '/house-share/:id/members/:memberId': {
@@ -115,7 +115,7 @@ export default {
             if (!membership[0]) throw new SafeDisplayError("This user is not a member of this house-share", 400);
             await updateHouseShareMember(Number(memberId), Number(id));
 
-            return Response.json({message: "Successfully kicked the user from the house-share"}, {status: 200});
+            return CorsResponse.json({message: "Successfully kicked the user from the house-share"}, {status: 200});
         }
     },
     '/house-share/:id/members/:memberId/transfer': {
@@ -130,7 +130,7 @@ export default {
             if (!membership[0]) throw new SafeDisplayError("This user is not a member of this house-share", 400);
             await updateHouseShareManager(Number(id), Number(memberId));
 
-            return Response.json({message: "Successfully transferred ownership"}, {status: 200});
+            return CorsResponse.json({message: "Successfully transferred ownership"}, {status: 200});
         }
     },
     '/house-share/:id/purchases': {
@@ -143,7 +143,7 @@ export default {
             const limit = castToNumber(searchParams.get('limit'));
             const offset = castToNumber(searchParams.get('offset'));
             const purchases = await getPurchases(Number(id), limit, offset);
-            return Response.json(purchases);
+            return CorsResponse.json(purchases);
         }
     },
     '/house-share/:id/invites': {
@@ -154,7 +154,7 @@ export default {
             const house = await getHouseShare(Number(id));
             if (!house[0]) throw new SafeDisplayError("house-share not found!", 404);
             const invites = await getHouseShareInvites(Number(id));
-            return Response.json(invites);
+            return CorsResponse.json(invites);
         },
         POST: async (req: BunRequest<"/house-share/:id/invites">) => {
             const userId = AuthHelper.checkAuth(req);
@@ -169,7 +169,7 @@ export default {
             if (await existsPendingInvite(user[0].id, Number(id))) throw new SafeDisplayError("User already has a pending invite", 400);
             if (await isMember(user[0].id, Number(id))) throw new SafeDisplayError("User is already a member of this house-share", 400);
             await createHouseShareInvite(Number(id), user[0].id);
-            return Response.json({message: "Invite created successfully"});
+            return CorsResponse.json({message: "Invite created successfully"});
         }
     }
 }

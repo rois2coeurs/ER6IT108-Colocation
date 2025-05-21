@@ -2,12 +2,11 @@ import {type BunRequest, postgres, sql} from "bun";
 import {AuthHelper} from "../helpers/authHelper.ts";
 import {UnauthorizedError} from "../errors/UnauthorizedError.ts";
 import {SafeDisplayError} from "../errors/SafeDisplayError.ts";
-import {castToNumber, setBounds} from "../utils.ts";
+import {castToNumber, CorsResponse, setBounds} from "../utils.ts";
 
 export default {
     '/shared-fund': {
         POST: async (req: BunRequest<"/shared-fund">) => {
-            console.log("POST /shared-fund");
             const userId = AuthHelper.checkAuth(req);
             const {houseShareId} = await req.json();
             if (!houseShareId) throw new SafeDisplayError("Missing House share ID", 400);
@@ -15,7 +14,7 @@ export default {
             if (!await isHouseShareManager(userId, Number(houseShareId))) throw new UnauthorizedError("You are not the manager of this house share");
             if (await existsSharedFund(Number(houseShareId))) throw new SafeDisplayError("Shared fund already exists", 400);
             const sharedFundId = await createSharedFund(Number(houseShareId));
-            return Response.json({message: "Shared fund created successfully", id: sharedFundId});
+            return CorsResponse.json({message: "Shared fund created successfully", id: sharedFundId});
         }
     },
     '/shared-fund/:id': {
@@ -29,7 +28,7 @@ export default {
             const sharedFund = await getSharedFund(Number(id));
             if (!sharedFund[0]) throw new SafeDisplayError("Shared fund not found", 404);
 
-            return Response.json(sharedFund[0]);
+            return CorsResponse.json(sharedFund[0]);
         }
     },
     '/shared-fund/:id/contributions': {
@@ -45,7 +44,7 @@ export default {
             const offset = castToNumber(searchParams.get('offset')) ?? 0;
 
             const contributions = await getContributions(Number(id), limit, offset);
-            return Response.json(contributions);
+            return CorsResponse.json(contributions);
         },
         POST: async (req: BunRequest<"/shared-fund/:id/contributions">) => {
             const userId = AuthHelper.checkAuth(req);
@@ -60,7 +59,7 @@ export default {
 
             await addContribution(userId, Number(id), Number(amount));
 
-            return Response.json({message: "Contribution added successfully"});
+            return CorsResponse.json({message: "Contribution added successfully"});
         }
     }
 }

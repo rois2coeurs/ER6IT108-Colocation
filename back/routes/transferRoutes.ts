@@ -2,6 +2,7 @@ import {type BunRequest, sql} from "bun";
 import {AuthHelper} from "../helpers/authHelper.ts";
 import {UnauthorizedError} from "../errors/UnauthorizedError.ts";
 import {SafeDisplayError} from "../errors/SafeDisplayError.ts";
+import {CorsResponse} from "../utils.ts";
 
 export default {
     '/transfer/:userId': {
@@ -11,7 +12,7 @@ export default {
             const searchParams = new URLSearchParams(new URL(req.url).search);
             if (currentUserId !== Number(userId)) throw new UnauthorizedError("You are not authorized to view this user's transfers");
             const transfers = await getUserTransfers(Number(userId), Number(searchParams.get("limit") || 10), Number(searchParams.get("offset") || 0));
-            return Response.json(transfers);
+            return CorsResponse.json(transfers);
         },
         POST: async (req: BunRequest<"/transfer/:userId">) => {
             const currentUserId = AuthHelper.checkAuth(req);
@@ -24,7 +25,7 @@ export default {
             if (!recipient[0]) throw new SafeDisplayError("Recipient not found", 404);
             if (currentUserId === recipient[0].id) throw new SafeDisplayError("You cannot transfer to yourself", 400);
             await createTransfer(currentUserId, recipient[0].id, amount);
-            return Response.json({message: "Transfer created"}, {status: 201});
+            return CorsResponse.json({message: "Transfer created"}, {status: 201});
         }
     }
 }

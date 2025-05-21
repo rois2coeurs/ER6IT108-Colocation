@@ -1,6 +1,7 @@
 import {AuthHelper} from "../helpers/authHelper.ts";
 import {type BunRequest, sql} from "bun";
 import {TokenHelper} from "../helpers/tokenHelper.ts";
+import {CorsResponse} from "../utils.ts";
 
 export default {
     '/login': {
@@ -9,15 +10,15 @@ export default {
             const userId = TokenHelper.checkToken(token);
             if (userId) {
                 const user = await getUserGeneralInfo(userId);
-                return Response.json({token, user: user[0]});
+                return CorsResponse.json({token, user: user[0]});
             }
-            return Response.json({token});
+            return CorsResponse.json({token});
         }
     },
     '/validate': {
         GET: async (req: BunRequest<"/validate">) => {
             const userId = AuthHelper.checkAuth(req);
-            return Response.json({userId});
+            return CorsResponse.json({userId});
         }
     },
     '/register': {
@@ -26,9 +27,9 @@ export default {
             const userId = TokenHelper.checkToken(token);
             if (userId) {
                 const user = await getUserGeneralInfo(userId);
-                return Response.json({token, user: user[0]});
+                return CorsResponse.json({token, user: user[0]});
             }
-            return Response.json({token});
+            return CorsResponse.json({token});
         }
     }
 }
