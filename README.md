@@ -1,13 +1,6 @@
 # URL du site Web
 https://coloc.valentinraillard.fr/
 
-# Login
-## Login Admin
-
-## Login Manager
-
-## Login User
-
 # Install and run the web app
 
 ## Docker
