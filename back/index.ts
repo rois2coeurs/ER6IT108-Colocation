@@ -15,7 +15,6 @@ Bun.spawn(["bun", "run", "migrator.ts"], {
 });
 
 Bun.serve({
-    development: undefined,
     port: 3000,
     fetch(req) {
         if (req.method === 'OPTIONS') return new CorsResponse(null, {status: 204});
@@ -28,7 +27,7 @@ Bun.serve({
         ...purchaseRoutes,
         ...sharedFundRoutes,
         ...invitesRoutes,
-        '/health': new CorsResponse("OK", {status: 201}),
+        '/health': new CorsResponse("OK", {status: 200}),
     },
     error(error: Error) {
         if (error instanceof SafeDisplayError) {

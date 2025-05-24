@@ -115,8 +115,8 @@ const selectedTargets = ref<number[]>([]);
 <template>
   <NuxtLayout title="Mes paiements">
     <Card title="Nouvel achat" icon="bx:bxs-purchase-tag" button-icon="bx:bxs-plus-circle"
-          button-text="Déclarer un nouvel achat" :on-button-click="postPurchase">
-      <form ref="form">
+          button-text="Déclarer un nouvel achat" :on-button-click="postPurchase" :display-button="!!houseShareId">
+      <form ref="form" v-if="houseShareId">
         <FormErrorBox :errors="errors"/>
         <FormInput input-type="text" name="title" label="Nom de l'achat" placeholder="2kg de pâtes"/>
         <FormInput input-type="number" name="amount" label="Montant (€)" placeholder="2"/>
@@ -126,6 +126,9 @@ const selectedTargets = ref<number[]>([]);
                        @update:model-value="(value) => selectedTargets.value = value"
                        empty-value="Toute la colocation"/>
       </form>
+      <span v-else>
+        Il vous faut rejoindre une colocation pour pouvoir déclarer de nouveaux achats.
+      </span>
     </Card>
     <Card title="Historique de vos achats" icon="mdi:history" :button-text="historyButtonText"
           :display-button="remaining > 0 " :on-button-click="loadMorePurchases" fullscreen-button
