@@ -5,7 +5,7 @@
   <div class="container">
     <div class="box">
       <div class="header">
-        <h2><NuxtLink to="/login">Connection</NuxtLink></h2>
+        <h2><NuxtLink to="/login">Connexion</NuxtLink></h2>
         <h2><NuxtLink to="/register">Inscription</NuxtLink></h2>
       </div>
       <div>

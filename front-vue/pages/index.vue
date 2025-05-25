@@ -1,5 +1,5 @@
 <template>
-  <NuxtLayout title="Acceuil">
+  <NuxtLayout title="Accueil">
     <Card title="Bienvenue dans l'application de Colocation" icon="mdi:home-group" :display-button="false">
       <template #default>
         <p class="intro-text">Simplifiez la gestion de votre colocation: partagez les dépenses, suivez les versements et organisez vos achats.</p>

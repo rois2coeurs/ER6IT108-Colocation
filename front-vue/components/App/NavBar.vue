@@ -22,7 +22,7 @@ async function loadIds() {
     <div class="nav-item">
       <NuxtLink to="/">
         <Icon name="mdi:home-variant"/>
-        Acceuil
+        Accueil
       </NuxtLink>
     </div>
     <div class="nav-item">

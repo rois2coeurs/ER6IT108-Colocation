@@ -58,7 +58,7 @@ await loadTransfers();
 <template>
   <NuxtLayout title="Colocation">
     <Card
-        title="Envoyé de l'argent"
+        title="Envoyer de l'argent"
         icon="hugeicons:money-send-circle"
         :on-button-click="postSendMoney"
         button-text="Envoyer de l'argent"
